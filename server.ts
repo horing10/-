@@ -77,22 +77,27 @@ async function generateAIBatchQuestions(topic: string, difficulty: string, count
     const topicQuery = topic ? `Gugak topic: "${topic}"` : "random interesting Gugak topics";
     const difficultyQuery = difficulty ? `difficulty: "${difficulty}"` : "medium";
 
-    const prompt = `Generate a list of exactly ${count} educational multiple-choice quiz questions in Korean about Korean Traditional Music (국악 - Gugak).
+    const prompt = `Generate a list of exactly ${count} highly professional, academically rigorous multiple-choice quiz questions in Korean about Korean Traditional Music (국악 - Gugak) based on authoritative musicology, doctoral exam levels, and National Gugak Center (국립국악원) publications/treatises.
 Requirements:
 1. Topic filter: ${topicQuery}
 2. Difficulty: ${difficultyQuery}
-3. Correct answers must be strictly accurate.
-4. Output must be a JSON array of objects fitting the schema below.
-5. High quality, clear polite native Korean language.
+3. The questions must be deeply professional and educational. Avoid trivial or common-sense questions. Focus on:
+   - Musicology & Theory: Sam-bun-son-ik-beop (삼분손익법) math, Pal-eum (팔음) material classification, Shigeem-sae (시김새) detailed acoustic ornaments, Hanbae (한배) tempo, Pyeongjo & Gyemyeonjo (평조/계면조) modes, Yeon-eum-beop (연음법) performance links.
+   - History: Treated writings such as Akhak Gwebeom (악학궤범), Goryeosa (고려사) music treatises, Samguk Sagi (삼국사기) musical sections, historical kings (Sejong, King Gasil, Wang San-ak, Shinmun).
+   - Instrument details: Anatomy such as Gayageum 12 strings/Anjok, Daegeum cheong/Chwigu/Chilseonggong, Geomungo Suldae/Gwae, Haegeum 2 strings/Wonsan, Janggu Gungpyeon/Chaepyeon.
+   - Traditional genres: Pansori, Jongmyo Jeryeak (등가/헌가 ensembles, Chuk/Eo openers), Sanjo, Gagok, Shinawi, Daechyuta.
+4. Correct answers must be 100% historically and musicologically verified and strictly accurate.
+5. Output must be a JSON array of objects fitting the schema below.
+6. Use deep, professional, polite, and warm native Korean language.
 
 Format your output as a single JSON array containing objects with these keys:
 - topic (one of: 'instrument', 'theory', 'genre', 'history', 'general')
-- question (string, polite)
-- options (array of exactly 4 strings)
+- question (string, extremely professional and polite)
+- options (array of exactly 4 strings, highly challenging)
 - correctAnswer (integer, 0 to 3)
-- explanation (string)
+- explanation (string, highly detailed containing educational citations of treatises/National Gugak Center resources)
 - difficulty (one of: 'easy', 'medium', 'hard')
-- hint (string)
+- hint (string, friendly but academically useful)
 `;
 
     const response = await ai.models.generateContent({
@@ -536,20 +541,20 @@ app.post("/api/quiz/generate", async (req, res) => {
       ? `You MUST generate a question of type: "${requestedType}".`
       : `You can freely choose to generate any of the three question types: 'multiple_choice' (standard 4 choices), 'visual' (instrument identification based on description of its physical visual parts), or 'matching' (matching 4 traditional terms/concepts to their definitions). Please vary the selected type frequently!`;
 
-    const prompt = `Generate a high-quality, educational, and authentic Korean Traditional Music (국악 - Gugak) quiz question in Korean.
+    const prompt = `Generate an exceptionally high-quality, academically rigorous, and authentic Korean Traditional Music (국악 - Gugak) research-grade quiz question in Korean based on National Gugak Center (국립국악원) guidelines, historical treatises, and doctoral examinations.
 Requirements:
 1. Topic should match: ${topicQuery}
 2. Difficulty should match: ${difficultyQuery}
 3. Question Type should conform to: ${typeQuery}
-4. Explanation and Correct answer must be exactly correct and historically verified.
+4. Explanation and Correct answer must be exactly correct, thoroughly academically justified, and cite relevant historical treaties (e.g. 악학궤범, 고려사, 삼국사기, 세종실록).
 5. Output must strictly conform to the JSON schema.
-6. All texts, options, explanations, and hints must be in polite, native and warm Korean language using traditional scholar style ("~라네", "~하오", "~라오" or polite 하오체/하십시오체).
-7. Do not include duplicate questions resembling basic common sense. Look into authentic Gugak theory, instrument details (like Gayageum strings/Anjok, Daegeum cheong, Geomungo Suldae/Gwae, Haegeum 2 strings/Wonsan, Janggu Gungpyeon/Chaepyeon), historical records (Sejong, King Gasil, Wang San-ak, Manpaksikjeok), or traditional genres (Pansori, Jongmyo Jeryeak, Semachi rhythm, Shinawi, Sanjo, Gagok).
+6. All texts, options, explanations, and hints must be in highly professional, polite, and respectful Korean language using traditional scholar style ("~라네", "~하오", "~라오" or polite 하오체/하십시오체/해요체).
+7. Avoid basic or casual general-knowledge questions. Focus on advanced Gugak theory (sam-bun-son-ik-beop tuning, Pal-eum, Shigeem-sae, Hanbae, Pyeongjo/Gyemyeonjo, Samhyeon Yukgak), detailed instrument anatomy, royal court music (Jongmyo Jeryeak등가/헌가, Yeominrak, Sujecheon, Chirhyeongeum, Saeghwang), or elite traditional performance genres.
 
 Specifically for each type:
 - If type is 'multiple_choice': 'options' must contain exactly 4 text options, 'correctAnswer' must be the index of correct option (0-3). 'matchingPairs' and 'instrumentId' can be left null/unused.
-- If type is 'visual': 'instrumentId' must be one of 'gayageum', 'geomungo', 'haegeum', or 'janggu'. State what the visual features are in the question (e.g. 12 strings, 2 strings with bow, or hourglass shape). 'options' must contain 4 instruments, and 'correctAnswer' is the index of the correct instrument option.
-- If type is 'matching': 'options' must be an empty array [], 'correctAnswer' must be 99. 'matchingPairs' must contain exactly 4 logical conceptual pairs (each with 'left' name and 'right' explanation text).`;
+- If type is 'visual': 'instrumentId' must be one of 'gayageum', 'geomungo', 'haegeum', or 'janggu'. State what the visual features are in the question (e.g. 12 strings, 2 strings with bow, or hourglass shape) referencing educational museum catalog descriptions. 'options' must contain 4 instruments, and 'correctAnswer' is the index of the correct instrument option.
+- If type is 'matching': 'options' must be an empty array [], 'correctAnswer' must be 99. 'matchingPairs' must contain exactly 4 advanced matching pairs of traditional music terms and their precise musicological definitions.`;
 
     const response = await ai.models.generateContent({
       model: "gemini-3.5-flash",

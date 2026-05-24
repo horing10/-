@@ -16,166 +16,59 @@ import MultiplayerArena from './MultiplayerArena';
 
 // Premium high-fidelity graphic illustrations for traditional Gugak instruments
 function GugakInstrumentVisual({ instrumentId, isAnswered }: { instrumentId: string; isAnswered: boolean }) {
-  switch (instrumentId) {
-    case 'gayageum':
-      return (
-        <div className="w-full max-w-md mx-auto h-40 bg-[#FAF7F0] border-4 border-zinc-900 rounded-3xl flex flex-col items-center justify-center p-4 relative overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] my-4">
-          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#b45309_1.5px,transparent_1.5px)] [background-size:16px_16px]"></div>
-          {/* Main Soundboard Body */}
-          <div className="w-11/12 h-12 bg-[#854d0e] rounded-xl border-2 border-zinc-900 relative flex items-center shadow-[inset_0px_2px_4px_rgba(255,255,255,0.2),2px_4px_8px_rgba(0,0,0,0.15)]">
-            <div className="absolute inset-x-4 h-[2px] bg-amber-950 opacity-30 top-3"></div>
-            <div className="absolute inset-x-4 h-[2px] bg-amber-950 opacity-20 top-8"></div>
-            
-            {/* Elegant ㅅ-shaped 안족 Pegs */}
-            <div className="absolute inset-x-12 flex justify-between px-1">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="w-3 h-5 bg-[#fef08a] border-2 border-zinc-900 rotate-45 transform origin-center flex items-center justify-center shadow-xs">
-                  <span className="text-[6px] font-sans font-black text-rose-700 -rotate-45">ㅅ</span>
-                </div>
-              ))}
-            </div>
+  const images: { [key: string]: { url: string; label: string; desc: string; source: string } } = {
+    gayageum: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/2/23/Korean_instrument-Gayageum-02.jpg',
+      label: '가야금 (Gayageum)',
+      desc: '오동나무 울림통 위에 기러기발(안족)을 세우고 명주실 12줄을 얹어 손가락 끝으로 직접 주무르고 뜯는 대표 현악기',
+      source: '국립국악원 소장 해상 고증 사진'
+    },
+    geomungo: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/0/07/Geomungo.jpg',
+      label: '거문고 (Geomungo)',
+      desc: '오동나무 판 위 괘에 걸린 6현의 굵은 명주실을 대나무 술대를 쥔 채 기개 있고 힘차게 내리치거나 뜨는 선비의 악기',
+      source: '전통 악기 박물관 실물 전시 사진'
+    },
+    haegeum: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/2/22/Korean_instrument-Haegeum-01.jpg',
+      label: '해금 (Haegeum)',
+      desc: '둥근 대나무 울림통과 입구대 기둥 사이에 수놓아진 두 가닥의 명주실 사이에 말총 활시위를 끼워 마찰시켜 높은 연주력을 자랑하는 대표 찰현악기',
+      source: '국악 전주 보전 연구회 학술 사진'
+    },
+    janggu: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/4/4e/Korean_instrument-Janggu-01.jpg',
+      label: '장구 (Janggu)',
+      desc: '잘록한 모래시계 오동나무 통 양편에 소와 말 등 가죽판을 대고 궁글채와 열채로 장단을 연타하는 핵심 타격 장기',
+      source: '국립국악원 표준 소리 기각 사진'
+    }
+  };
 
-            {/* Side mounts */}
-            <div className="absolute left-1 w-3 h-9 bg-amber-950 border-2 border-zinc-900 rounded-lg"></div>
-            <div className="absolute right-1 w-6 h-9 bg-yellow-950 border-2 border-zinc-900 rounded-lg flex flex-col justify-around py-1 px-0.5">
-              <div className="h-0.5 bg-yellow-100/40 rounded"></div>
-              <div className="h-0.5 bg-yellow-100/40 rounded"></div>
-              <div className="h-0.5 bg-yellow-100/40 rounded"></div>
-            </div>
+  const current = images[instrumentId];
+  if (!current) return null;
 
-            {/* 12 Horizontal strings (Simulated) */}
-            <div className="absolute inset-x-4 h-8 flex flex-col justify-between py-1 z-10 pointer-events-none">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-[1.5px] bg-[#fef8c3] border-t border-zinc-950/40 w-full animate-pulse" style={{ animationDelay: `${i * 150}ms` }}></div>
-              ))}
-            </div>
-          </div>
-          <span className="text-[10px] font-mono text-amber-900 font-extrabold mt-3 uppercase tracking-widest bg-amber-100 px-3 py-1 border-2 border-zinc-900 rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            {isAnswered ? "가야금 (12줄과 명주 안족대)" : "이 전통 국악기(현악기)는 무엇일까요?"}
-          </span>
+  return (
+    <div className="w-full max-w-md mx-auto bg-[#FAF7F0] border-4 border-zinc-900 rounded-2xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] my-4 font-sans flex flex-col">
+      <div className="relative h-48 bg-white border-b-2 border-zinc-900 flex items-center justify-center p-3 overflow-hidden">
+        <img 
+          src={current.url} 
+          alt={current.label}
+          referrerPolicy="no-referrer"
+          className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
+        />
+        <div className="absolute top-2 right-2 bg-zinc-900/80 backdrop-blur-xs text-white text-[8px] font-mono px-2 py-0.5 rounded border border-zinc-700">
+          {current.source}
         </div>
-      );
-    case 'geomungo':
-      return (
-        <div className="w-full max-w-md mx-auto h-40 bg-[#FAF7F0] border-4 border-zinc-900 rounded-3xl flex flex-col items-center justify-center p-4 relative overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] my-4">
-          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#78350f_1.5px,transparent_1.5px)] [background-size:16px_16px]"></div>
-          {/* Dark Charcoal Soundboard */}
-          <div className="w-11/12 h-14 bg-zinc-800 rounded-xl border-2 border-zinc-900 relative flex items-center shadow-[inset_0px_2px_4px_rgba(255,255,255,0.1),2px_4px_8px_rgba(0,0,0,0.2)]">
-            
-            {/* Raised frets (괘) */}
-            <div className="absolute left-16 right-24 flex justify-between">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="w-2.5 h-8 bg-amber-700 border-2 border-zinc-900 rounded-b-md shadow-xs"></div>
-              ))}
-            </div>
-            
-            {/* 6 Thick silk strings */}
-            <div className="absolute inset-x-4 h-10 flex flex-col justify-between py-1.5 z-10 pointer-events-none">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-[2px] bg-yellow-200 border-t border-zinc-950/50 w-full"></div>
-              ))}
-            </div>
-
-            {/* Headpiece tag */}
-            <div className="absolute right-2 w-8 h-10 bg-zinc-900 border-2 border-zinc-950 rounded-lg flex items-center justify-center shadow-xs">
-              <span className="text-[8px] text-zinc-400 font-serif font-black">학달</span>
-            </div>
-          </div>
-          
-          {/* Bamboo Striking Rod (술대) */}
-          <div className="w-24 h-1.5 bg-amber-150 border-2 border-zinc-900 rotate-[15deg] transform absolute bottom-10 right-14 z-20 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.15)] rounded-full"></div>
-          
-          <span className="text-[10px] font-mono text-zinc-700 font-extrabold mt-3 uppercase tracking-widest bg-zinc-100 px-3 py-1 border-2 border-zinc-900 rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            {isAnswered ? "거문고 (검은 학의 가락 & 술대)" : "이 전통 국악기(현악기)는 무엇일까요?"}
-          </span>
-        </div>
-      );
-    case 'haegeum':
-      return (
-        <div className="w-full max-w-md mx-auto h-40 bg-[#FAF7F0] border-4 border-zinc-900 rounded-3xl flex items-center justify-center gap-6 p-4 relative overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] my-4">
-          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#18181b_1.5px,transparent_1.5px)] [background-size:16px_16px]"></div>
-          
-          <div className="flex items-center gap-7 relative z-10">
-            {/* Upright Pegbox and neck */}
-            <div className="relative w-14 h-28 flex flex-col items-center">
-              {/* Wooden Tuning Pegs (주철) */}
-              <div className="absolute top-0 w-9 h-2.5 bg-amber-950 border-2 border-zinc-900 rounded-sm"></div>
-              <div className="absolute top-4 -left-2 w-7 h-2 bg-amber-800 border-2 border-zinc-900 rounded-md rotate-[-15deg]"></div>
-              <div className="absolute top-9 -left-2 w-7 h-2 bg-amber-800 border-2 border-zinc-900 rounded-md rotate-[15deg]"></div>
-              
-              {/* Neck rod */}
-              <div className="w-2.5 h-20 bg-[#6b4423] border-x-2 border-zinc-900"></div>
-              
-              {/* Bamboo Resonator (울림통) */}
-              <div className="w-12 h-11 bg-amber-900 rounded-lg border-2 border-zinc-900 shadow-md flex items-center justify-center">
-                <div className="w-10 h-[2px] bg-zinc-950"></div>
-              </div>
-              
-              {/* String bridge (원산) */}
-              <div className="absolute bottom-9 w-4 h-2.5 bg-[#fef08a] border-2 border-zinc-900 rounded-sm shadow-xs"></div>
-              
-              {/* 2 Strings */}
-              <div className="absolute top-3 bottom-11 w-2 flex justify-between px-0.5">
-                <div className="w-[1.5px] h-full bg-[#fcd34d]"></div>
-                <div className="w-[1.5px] h-full bg-[#fca5a5]"></div>
-              </div>
-            </div>
-
-            {/* Bow (활대) */}
-            <div className="relative w-28 h-12 flex items-center">
-              {/* Curved Bamboo active stick */}
-              <div className="w-full h-2.5 bg-amber-600 rounded-full border-2 border-zinc-900 rotate-[-4deg] translate-y-[-4px]"></div>
-              {/* Horsehair bow strings */}
-              <div className="absolute inset-x-1 h-[2px] bg-zinc-400 border-b-2 border-zinc-650 w-full translate-y-[4px]"></div>
-              <div className="absolute left-2 px-1 py-0.5 bg-amber-150 border border-zinc-900 text-[6px] font-bold uppercase rounded leading-none">말총 활시위</div>
-            </div>
-          </div>
-          <span className="absolute bottom-2 text-[10px] font-mono text-zinc-650 font-extrabold uppercase tracking-wider bg-white px-2 py-0.5 border-2 border-zinc-900 rounded-md">
-            {isAnswered ? "해금 (두 줄 찰현악기)" : "이 전통 국악기(찰현악기)는 무엇일까요?"}
-          </span>
-        </div>
-      );
-    case 'janggu':
-      return (
-        <div className="w-full max-w-md mx-auto h-40 bg-[#FAF7F0] border-4 border-zinc-900 rounded-3xl flex flex-col items-center justify-center p-4 relative overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] my-4">
-          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#b91c1c_1.5px,transparent_1.5px)] [background-size:16px_16px]"></div>
-          
-          <div className="flex items-center justify-center relative scale-110">
-            {/* Left drumhead (궁편) */}
-            <div className="w-7 h-20 bg-amber-100 border-2 border-zinc-900 rounded-full flex items-center justify-center z-10 shadow-md">
-              <div className="w-4 h-16 bg-amber-200/50 rounded-full border-2 border-dashed border-zinc-500"></div>
-            </div>
-            
-            {/* Waist hollow wood (허리통) */}
-            <div className="w-16 h-11 bg-[#b91c1c] border-y-2 border-zinc-900 flex justify-between items-center relative shadow-[inset_0px_2px_4px_rgba(255,255,255,0.15)]">
-              <div className="w-4 h-11 bg-zinc-950/20"></div>
-              <div className="w-3.5 h-10 bg-[#450a0a] rounded-full border border-zinc-900"></div>
-              <div className="w-4 h-11 bg-zinc-950/20"></div>
-            </div>
-            
-            {/* Right drumhead (채편) */}
-            <div className="w-6 h-20 bg-amber-50 border-2 border-zinc-900 rounded-full flex items-center justify-center z-10 shadow-md">
-              <div className="w-3.5 h-16 bg-yellow-50 rounded-full border-2 border-dashed border-zinc-400"></div>
-            </div>
-
-            {/* Red leather laces and sliding buckles (조이개) */}
-            <div className="absolute inset-x-2 inset-y-4 flex flex-col justify-around pointer-events-none z-15">
-              <div className="h-[2px] bg-red-650 w-full border-t border-zinc-950 rotate-[14deg]"></div>
-              <div className="h-[2px] bg-red-650 w-full border-t border-zinc-950 -rotate-[14deg]"></div>
-              <div className="h-[2px] bg-red-650 w-full border-t border-zinc-950"></div>
-              {/* buckle pills */}
-              <div className="absolute left-6 top-3 w-2.5 h-4 bg-amber-950 border border-zinc-900 rounded-sm"></div>
-              <div className="absolute right-6 top-11 w-2.5 h-4 bg-amber-950 border border-zinc-900 rounded-sm"></div>
-            </div>
-          </div>
-          <span className="text-[10px] font-mono text-zinc-700 font-extrabold mt-3 uppercase tracking-widest bg-white px-3 py-1 border-2 border-zinc-900 rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            {isAnswered ? "장구 (비의 소리 & 설가죽 궁채)" : "이 전통 국악기(타악기)는 무엇일까요?"}
-          </span>
-        </div>
-      );
-    default:
-      return null;
-  }
+      </div>
+      <div className="p-3 text-center bg-[#FAF7F0]">
+        <h4 className="text-zinc-900 font-extrabold text-xs mb-1">
+          {isAnswered ? current.label : "국립국악원 도해 - 이 전통 음악 기물은 무엇일까요?"}
+        </h4>
+        <p className="text-zinc-650 text-[10px] leading-relaxed font-semibold">
+          {isAnswered ? current.desc : "학술 문헌과 전시 도록에 기재된 전통 악기의 고해상도 실제 유물 사진 자료입니다."}
+        </p>
+      </div>
+    </div>
+  );
 }
 
 export default function QuizArena() {
