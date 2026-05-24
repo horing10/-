@@ -25,7 +25,7 @@ export default function AskScholar() {
   // Suggestions that users can click to ask instantly
   const questionSuggestions = [
     '가야금과 거문고 줄 수와 수법은 왜 다를까요?',
-    '바람과 풍파를 가라앉혔다는 만파식적 대금 전설이 궁금하옵니다.',
+    '국악을 귀로 감상할 수 있는 유튜브 채널을 추천해 주시게나!',
     '경기민요와 남도민요(육자배기)는 소리 내는 법이 어떻게 다른가요?',
     '판소리 다섯 마당(다섯 바탕)에는 무엇무엇이 있나요?'
   ];
@@ -99,11 +99,63 @@ export default function AskScholar() {
     }
   };
 
+  // Render helper to format markdown links [text](url) and bold **text** safely
+  const formatMessageText = (text: string) => {
+    if (!text) return null;
+
+    // Split text by markdown links: [Text](URL)
+    const parts = text.split(/(\[[^\]]+\]\(https?:\/\/[^\s\)]+\))/g);
+    
+    return parts.map((part, index) => {
+      const match = part.match(/^\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)$/);
+      if (match) {
+        const linkText = match[1];
+        const linkUrl = match[2];
+        return (
+          <a
+            key={index}
+            href={linkUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 my-1 mx-1 bg-red-50 hover:bg-[#E30613] hover:text-white border-2 border-zinc-900 rounded-xl text-xs font-black text-zinc-900 transition-all hover:translate-y-[-1px] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] no-underline cursor-pointer"
+          >
+            {linkText} ↗
+          </a>
+        );
+      }
+
+      // Inside non-link parts, split by bold markdown: **text**
+      const subParts = part.split(/(\*\*[^*]+\*\*)/g);
+      return subParts.map((subPart, subIdx) => {
+        const boldMatch = subPart.match(/^\*\*([^*]+)\*\*$/);
+        if (boldMatch) {
+          return (
+            <strong key={`${index}-${subIdx}`} className="font-extrabold text-zinc-950">
+              {boldMatch[1]}
+            </strong>
+          );
+        }
+        return subPart;
+      });
+    });
+  };
+
   // Helper answering typical questions if server fails or is offline
   const getOfflineScholarAnswer = (query: string): string => {
     const cleanQuery = query.toLowerCase();
 
-    if (cleanQuery.includes('피리') || cleanQuery.includes('구멍') || cleanQuery.includes('지공') || cleanQuery.includes('대금') || cleanQuery.includes('단소') || cleanQuery.includes('가야금') || cleanQuery.includes('거문고') || cleanQuery.includes('줄') || cleanQuery.includes('현') || cleanQuery.includes('악기')) {
+    if (cleanQuery.includes('피리') || cleanQuery.includes('구멍') || cleanQuery.includes('지공') || cleanQuery.includes('대금') || cleanQuery.includes('단소') || cleanQuery.includes('가야금') || cleanQuery.includes('거문고') || cleanQuery.includes('줄') || cleanQuery.includes('현') || cleanQuery.includes('생황') || cleanQuery.includes('악기')) {
+      if (cleanQuery.includes('생황')) {
+        return `에헴! 국악기 중 가장 신비롭고 아름다운 화음을 품은 **생황(Saeghwang)**에 관심이 있으시구려! 내 기쁜 마음으로 일러주겠네.
+
+생황은 다음과 같은 신묘한 비밀을 간직하고 있다네:
+1. **유일무이한 화음 관악기**: 일반적인 대금, 피리, 단소 등 국악 관악기는 한 번에 하나의 음만 연주하지만, 생황은 손가락으로 여러 지공을 함께 짚어 **국악기 중 유일하게 아름다운 "화음(chords)"을 조화롭게 자아낼 수 있는 관악기**라네.
+2. **구조와 재료 (17관 및 현대 개량형)**: 본래 오동나무나 금속(고대에는 동그란 박 바가지 자체)으로 만든 둥근 바람통(울림통) 위에 다양한 길이의 세밀한 대나무 관을 빙 둘러 꽂아 만드는데, 전통적인 생황은 **정확히 "17개의 대나무 관(17관)"**을 사용한다오! 요즘 현대에 이르러서는 넓은 화음 연주와 다채로운 조바꿈(전조)을 소화하기 위하여 **"24관"부터 "36관", "38관"** 같은 풍부한 동관 개량 생황도 널리 제작되어 무대 위에서 대활약하고 있다네.
+3. **독특한 발음 방식 (황, Reed)**: 각 대나무 관의 밑부분에는 쇠붙이로 된 얇은 떨림판인 '황(簧)'이 붙어 있어서, 숨을 들이마실 때(들숨)와 내쉴 때(날숨) 모두 이 황이 파르르 떨리며 영롱하게 울린다네. 아코디언이나 하모니카의 먼 조상 격이라 볼 수 있지!
+4. **생소병주 (笙簫竝奏)**: 생황의 맑고 우아하며 아스라한 소리는 단소의 맑고 가냘픈 선율과 우주적인 음색 조합을 지녔다네. 그래서 생황과 단소의 이중주를 **'생소병주'**라 칭하며, 선비들이 가장 지극히 사랑한 영혼의 풍류 예술이었다네.
+
+오색구름 속에 깃들어 조화를 부리는 신선의 악기, 생황 고유의 깊이를 깊숙이 이해해 보시게나!`;
+      }
       if (cleanQuery.includes('피리')) {
         return `에헴! 피리(Piri)에 대해 묻는구려. 기특하기도 해라! 
         
@@ -180,6 +232,34 @@ export default function AskScholar() {
 자네는 이 중 어떤 가락의 박자가 마음에 와닿으시는가?`;
     }
 
+    if (cleanQuery.includes("유튜브") || cleanQuery.includes("youtube") || cleanQuery.includes("추천") || cleanQuery.includes("링크") || cleanQuery.includes("채널") || cleanQuery.includes("영상") || cleanQuery.includes("동영상")) {
+      return `허허허! 맑은 눈의 학도여, 눈부시게 움직이는 현대의 기예인 동영상(유튜브)을 통해 국악을 배우려 하시다니! 참으로 기특하고 현명한 배움이라네.
+
+내가 평소에도 즐겨보며 학도들에게 권하는 우리 겨레의 **국악 유튜브 천하 명품 채널**들을 추려 주겠소. 아래 링크를 선택하면 즉석에서 소리를 감상하러 갈 수 있다네!
+
+1. **국립국악원 (National Gugak Center)**
+- [국립국악원 유튜브](https://www.youtube.com/@gugak1951)
+- *특징*: 궁중 정악, 아악부터 신명 나는 민속악까지 모든 전통 가락의 종갓집이라네! 최고의 연주력과 음향으로 우리 음악을 소장해 두었소.
+
+2. **국악방송 (Gugak TV)**
+- [국악방송 유튜브](https://www.youtube.com/@gugaktv)
+- *특징*: 풍성한 전국의 국악 축제, 명창들의 경연, 국악 다큐멘터리가 송출되고 있어 친숙하게 귀를 틔울 수 있다네.
+
+3. **이날치 (LEENALCHI)**
+- [이날치 OFFICIAL](https://www.youtube.com/@leenalchiofficial)
+- *특징*: 수궁가 판소리 대목을 엄청나게 신나고 세련된 팝 가락으로 엮어 온 세상을 흔든 퓨전 국악의 신화라네!
+
+4. **악단광칠 (ADG7)**
+- [악단광칠 유튜브](https://www.youtube.com/@ADG7)
+- *특징*: 황해도 굿 장단과 서민의 소리를 기막히게 강력하고 힙한 현대식 에너자이저 그루브로 녹여내어 어깨가 절로 들썩이네!
+
+5. **서도밴드 (sEODo BAND)**
+- [서도밴드 유튜브](https://www.youtube.com/@seodoband)
+- *특징*: 국악 가락과 소울 팝을 접목하여 구성지고 아름다운 "조선팝(Chosun Pop)"이라는 뉴 장르 효시를 이룩한 예술적 악단이라오.
+
+에헴, 백문이 불여일견이고 백견이 불여일청이니, 어서 위 링크들을 눌러 즉석에서 국악의 참맛을 두 귀로 감상하러 가시게나!`;
+    }
+
     return `에헴... 학도여, 내가 자네가 던진 정밀한 고대 가락을 잠시 깊이 관조하고 있었다네. 
 
 인공지능 훈장의 등용선 비밀 열쇠(GEMINI_API_KEY)가 잠시 쉬고 있어서 방대한 우주 가락의 답은 못 낸으나, 대신 내 **가야금과 거문고 차이**, **만파식적 대금 이야기**, **경기/남도민요 해법**, 또는 **판소리 다섯 마당** 이야기 등은 언제든 물으면 즉각 서첩을 풀어드릴 테니 물어보시게나!`;
@@ -232,7 +312,7 @@ export default function AskScholar() {
                       ? 'bg-[#FFD700] text-zinc-950 rounded-tr-xs font-bold' 
                       : 'bg-white text-zinc-900 rounded-tl-xs font-serif font-semibold'
                   }`}>
-                    {msg.text}
+                    {formatMessageText(msg.text)}
                   </div>
                   <span className={`text-[10px] text-zinc-500 font-bold block ${isUser ? 'text-right' : 'text-left'}`}>
                     {msg.timestamp}
