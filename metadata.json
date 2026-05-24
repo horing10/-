@@ -1,0 +1,8 @@
+{
+  "name": "국악 퀴즈",
+  "description": "다채롭고 깊이 있는 한국 전통 음악(국악) 상식 퀴즈, 가상 국악기 소리 도감, 그리고 AI 훈장님과의 대화를 통해 국악을 쉽고 재미있게 배우는 교육용 애플리케이션입니다.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

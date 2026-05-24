@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Inter:wght@300;400;500;600;700&family=Noto+Serif+KR:wght@300;400;500;700;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Noto Serif KR", serif;
+  --font-traditional: "Gowun Batang", serif;
+  --font-sans: "Inter", sans-serif;
+  
+  --color-hanok-wood: #2a221f;
+  --color-hanok-clay: #733c29;
+  --color-hanok-moss: #46553e;
+  --color-hanok-gold: #b38540;
+  --color-hanok-paper: #faf7f2;
+}
+
+@layer utilities {
+  /* Elegant paper card styling */
+  .hanji-card {
+    background-color: #faf7f2;
+    border: 1px solid #e9dfcf;
+    box-shadow: 0 4px 20px -2px rgba(42, 34, 31, 0.05);
+    background-image: radial-gradient(#ece3d5 0.5px, transparent 0.5px), radial-gradient(#ece3d5 0.5px, #faf7f2 0.5px);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+  }
+  
+  /* Calligraphy stroke animation helper */
+  .ink-brush-active {
+    border-bottom: 2px solid #733c29;
+    position: relative;
+  }
+}
+
+/* Custom scrollbars for a cleaner look */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #fcfbfa;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #dcd1be;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #cbbba3;
+}
