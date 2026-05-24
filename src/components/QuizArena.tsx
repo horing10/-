@@ -16,47 +16,196 @@ import MultiplayerArena from './MultiplayerArena';
 
 // Premium high-fidelity graphic illustrations for traditional Gugak instruments
 function GugakInstrumentVisual({ instrumentId, isAnswered }: { instrumentId: string; isAnswered: boolean }) {
-  const images: { [key: string]: { url: string; label: string; desc: string; source: string } } = {
+  const images: { [key: string]: { url: string; fallbackUrl?: string; label: string; desc: string; source: string } } = {
     gayageum: {
-      url: 'https://upload.wikimedia.org/wikipedia/commons/2/23/Korean_instrument-Gayageum-02.jpg',
+      url: 'https://upload.wikimedia.org/wikipedia/commons/2/23/Korean_instruments-Gayageum-02.jpg',
+      fallbackUrl: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=600&q=80',
       label: '가야금 (Gayageum)',
       desc: '오동나무 울림통 위에 기러기발(안족)을 세우고 명주실 12줄을 얹어 손가락 끝으로 직접 주무르고 뜯는 대표 현악기',
       source: '국립국악원 소장 해상 고증 사진'
     },
     geomungo: {
-      url: 'https://upload.wikimedia.org/wikipedia/commons/0/07/Geomungo.jpg',
+      url: 'https://upload.wikimedia.org/wikipedia/commons/0/03/Korean_instruments-Geomungo-01.jpg',
+      fallbackUrl: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=600&q=80',
       label: '거문고 (Geomungo)',
       desc: '오동나무 판 위 괘에 걸린 6현의 굵은 명주실을 대나무 술대를 쥔 채 기개 있고 힘차게 내리치거나 뜨는 선비의 악기',
       source: '전통 악기 박물관 실물 전시 사진'
     },
     haegeum: {
-      url: 'https://upload.wikimedia.org/wikipedia/commons/2/22/Korean_instrument-Haegeum-01.jpg',
+      url: 'https://upload.wikimedia.org/wikipedia/commons/2/22/Korean_instruments-Haegeum-01.jpg',
+      fallbackUrl: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=600&q=80',
       label: '해금 (Haegeum)',
       desc: '둥근 대나무 울림통과 입구대 기둥 사이에 수놓아진 두 가닥의 명주실 사이에 말총 활시위를 끼워 마찰시켜 높은 연주력을 자랑하는 대표 찰현악기',
       source: '국악 전주 보전 연구회 학술 사진'
     },
     janggu: {
-      url: 'https://upload.wikimedia.org/wikipedia/commons/4/4e/Korean_instrument-Janggu-01.jpg',
+      url: 'https://upload.wikimedia.org/wikipedia/commons/4/4e/Korean_instruments-Janggu-01.jpg',
+      fallbackUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/ec/Janggu.jpg',
       label: '장구 (Janggu)',
       desc: '잘록한 모래시계 오동나무 통 양편에 소와 말 등 가죽판을 대고 궁글채와 열채로 장단을 연타하는 핵심 타격 장기',
       source: '국립국악원 표준 소리 기각 사진'
+    },
+    daegeum: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/d/de/Korean_instruments-Daegeum-01.jpg',
+      fallbackUrl: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=600&q=80',
+      label: '대금 (Daegeum)',
+      desc: '대나무로 만든 가로피리로, 맑고 고운 갈대속살 울림막인 청(淸)이 울며 나오는 호소력 깊고 장대한 성음이 특징인 악기',
+      source: '국립국악원 소장 대금 유물 사진'
+    },
+    pyeongyeong: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/7/75/Korean_instruments-Pyeongyeong-01.jpg',
+      fallbackUrl: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=600&q=80',
+      label: '편경 (Pyeongyeong)',
+      desc: '16개의 ㄱ자 모양 경석(옥돌)을 두 단의 나무 틀에 매달고 망치(뿔망치)로 쳐서 일정한 높이의 완벽한 아악 기맥을 연주하는 대표 석(石)부 타악기',
+      source: '종묘제례악 연향 도록 사진'
+    },
+    taepyeongso: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/0/07/Korean_instruments-Taepyeongso-01.jpg',
+      fallbackUrl: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=600&q=80',
+      label: '태평소 (Taepyeongso)',
+      desc: '나무 몸통과 황동제 나발, 겹피리 서(Seol)를 부착해 군례 행진 및 풍물놀이에서 가장 우렁차고 씩씩한 호령조 소리를 내뿜는 관악기',
+      source: '조선 왕조 군중 행례 고증 사진'
     }
   };
 
   const current = images[instrumentId];
   if (!current) return null;
 
+  // Local state to handle fallbacks if the load fails or returns HTTP 403/404
+  const [imgSrc, setImgSrc] = useState<string>(current.url);
+  const [isBroken, setIsBroken] = useState<boolean>(false);
+
+  useEffect(() => {
+    setImgSrc(current.url);
+    setIsBroken(false);
+  }, [instrumentId, current.url]);
+
+  const handleImageError = () => {
+    if (current.fallbackUrl && imgSrc !== current.fallbackUrl) {
+      setImgSrc(current.fallbackUrl);
+    } else {
+      setIsBroken(true);
+    }
+  };
+
+  // Exquisite vector graphic fallback styled with a modern traditional Korean aesthetic
+  const renderVectorFallback = () => {
+    switch (instrumentId) {
+      case 'gayageum':
+        return (
+          <svg className="w-full h-full p-4 text-amber-700" viewBox="0 0 200 100" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="10" y="30" width="180" height="40" rx="8" fill="#F4EAE0" stroke="#78350F" strokeWidth="3" />
+            <line x1="15" y1="35" x2="15" y2="65" stroke="#78350F" strokeWidth="4" />
+            <line x1="185" y1="35" x2="185" y2="65" stroke="#78350F" strokeWidth="4" />
+            {Array.from({ length: 12 }).map((_, i) => (
+              <g key={i}>
+                <line x1="15" y1={38 + i * 2.2} x2="185" y2={38 + i * 2.2} stroke="#B45309" strokeWidth="1" />
+                <path d={`M ${30 + i * 12} ${35 + i * 2} L ${34 + i * 12} ${45 + i * 2} L ${38 + i * 12} ${35 + i * 2}`} stroke="#78350F" strokeWidth="1.5" fill="none" />
+              </g>
+            ))}
+          </svg>
+        );
+      case 'geomungo':
+        return (
+          <svg className="w-full h-full p-4 text-amber-900" viewBox="0 0 200 100" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="10" y="30" width="180" height="40" rx="4" fill="#E5D3C3" stroke="#451A03" strokeWidth="3" />
+            {Array.from({ length: 14 }).map((_, i) => (
+              <rect key={i} x={30 + i * 10} y="33" width="4" height="34" fill="#451A03" opacity="0.8" />
+            ))}
+            {Array.from({ length: 6 }).map((_, i) => (
+              <line key={i} x1="15" y1={36 + i * 5} x2="185" y2={36 + i * 5} stroke="#78350F" strokeWidth="2" />
+            ))}
+            <line x1="25" y1="20" x2="45" y2="80" stroke="#1E293B" strokeWidth="3" strokeLinecap="round" />
+          </svg>
+        );
+      case 'haegeum':
+        return (
+          <svg className="w-full h-full p-4 text-zinc-800" viewBox="0 0 200 100" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="100" cy="75" r="16" fill="#F4EAE0" stroke="#18181B" strokeWidth="3" />
+            <line x1="100" y1="15" x2="100" y2="75" stroke="#18181B" strokeWidth="4" />
+            <line x1="90" y1="25" x2="115" y2="25" stroke="#18181B" strokeWidth="3" strokeLinecap="round" />
+            <line x1="90" y1="35" x2="115" y2="35" stroke="#18181B" strokeWidth="3" strokeLinecap="round" />
+            <line x1="98" y1="25" x2="98" y2="75" stroke="#78350F" strokeWidth="1" />
+            <line x1="102" y1="35" x2="102" y2="75" stroke="#78350F" strokeWidth="1" />
+            <line x1="75" y1="15" x2="125" y2="85" stroke="#1E293B" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        );
+      case 'janggu':
+        return (
+          <svg className="w-full h-full p-4 text-[#C29B7F]" viewBox="0 0 200 100" fill="none" stroke="currentColor" strokeWidth="2">
+            <ellipse cx="40" cy="50" rx="12" ry="25" fill="#FAF6F0" stroke="#2D2D30" strokeWidth="3" />
+            <ellipse cx="160" cy="50" rx="12" ry="25" fill="#FAF6F0" stroke="#2D2D30" strokeWidth="3" />
+            <path d="M 40 35 Q 100 45 160 35 L 160 65 Q 100 55 40 65 Z" fill="#8C5C3D" stroke="#2D2D30" strokeWidth="2" />
+            <path d="M 40 25 L 160 50 L 40 75 L 160 25 L 40 50 L 160 75" stroke="#A1A1AA" strokeWidth="1.5" />
+            {Array.from({ length: 6 }).map((_, i) => (
+              <circle key={i} cx={70 + i * 12} cy={38 + (i % 2 === 0 ? 3 : -3)} r="3" fill="#D97706" />
+            ))}
+          </svg>
+        );
+      case 'daegeum':
+        return (
+          <svg className="w-full h-full p-4 text-emerald-800" viewBox="0 0 200 100" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="20" y="42" width="160" height="16" rx="4" fill="#ECFDF5" stroke="#064E3B" strokeWidth="3" />
+            <line x1="40" y1="42" x2="40" y2="58" stroke="#064E3B" strokeWidth="2" />
+            {Array.from({ length: 6 }).map((_, i) => (
+              <circle key={i} cx={75 + i * 16} cy="50" r="3" fill="#064E3B" />
+            ))}
+            {Array.from({ length: 8 }).map((_, i) => (
+              <path key={i} d={`M ${30 + i * 18} 42 L ${30 + i * 18} 58`} stroke="#D97706" strokeWidth="1" />
+            ))}
+          </svg>
+        );
+      case 'pyeongyeong':
+        return (
+          <svg className="w-full h-full p-4 text-sky-850" viewBox="0 0 200 100" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="20" y="15" width="160" height="70" stroke="#451A03" strokeWidth="4" fill="none" />
+            <rect x="15" y="80" width="170" height="10" stroke="#451A03" strokeWidth="3" fill="#78350F" />
+            {Array.from({ length: 3 }).map((_, i) => (
+              <g key={i}>
+                <line x1={45 + i * 50} y1="15" x2={45 + i * 50} y2="40" stroke="#1E293B" strokeWidth="1.5" />
+                <path d={`M ${30 + i * 50} 40 L ${60 + i * 50} 40 L ${60 + i * 50} 60 L ${50 + i * 50} 60 L ${50 + i * 50} 50 L ${30 + i * 50} 40`} fill="#BAE6FD" stroke="#0284C7" strokeWidth="2" />
+              </g>
+            ))}
+          </svg>
+        );
+      case 'taepyeongso':
+        return (
+          <svg className="w-full h-full p-4 text-amber-600" viewBox="0 0 200 100" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M 25 45 L 140 38 L 175 25 L 175 75 L 140 62 L 25 55 Z" fill="#FBBF24" stroke="#78350F" strokeWidth="3" />
+            <line x1="15" y1="50" x2="25" y2="50" stroke="#1E293B" strokeWidth="4" />
+            <circle cx="20" cy="50" r="1.5" fill="#EF4444" />
+            {Array.from({ length: 5 }).map((_, i) => (
+              <circle key={i} cx={50 + i * 15} cy="48" r="2" fill="#78350F" />
+            ))}
+          </svg>
+        );
+      default:
+        return (
+          <div className="flex items-center justify-center h-full text-zinc-400">
+            <HelpCircle className="w-16 h-16 stroke-1 animate-pulse" />
+          </div>
+        );
+    }
+  };
+
   return (
     <div className="w-full max-w-md mx-auto bg-[#FAF7F0] border-4 border-zinc-900 rounded-2xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] my-4 font-sans flex flex-col">
       <div className="relative h-48 bg-white border-b-2 border-zinc-900 flex items-center justify-center p-3 overflow-hidden">
-        <img 
-          src={current.url} 
-          alt={current.label}
-          referrerPolicy="no-referrer"
-          className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
-        />
+        {isBroken ? (
+          <div className="w-full h-full bg-[#FAF7F0] flex items-center justify-center relative select-none">
+            {renderVectorFallback()}
+          </div>
+        ) : (
+          <img 
+            src={imgSrc} 
+            alt={current.label}
+            onError={handleImageError}
+            referrerPolicy="no-referrer"
+            className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
+          />
+        )}
         <div className="absolute top-2 right-2 bg-zinc-900/80 backdrop-blur-xs text-white text-[8px] font-mono px-2 py-0.5 rounded border border-zinc-700">
-          {current.source}
+          {isBroken ? "정밀 벡터 도해도 연출" : current.source}
         </div>
       </div>
       <div className="p-3 text-center bg-[#FAF7F0]">
