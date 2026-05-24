@@ -7,14 +7,16 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Award, Sparkles, AlertCircle, HelpCircle, ArrowRight,
-  RotateCcw, CheckCircle2, XCircle, ChevronRight, BookOpen, Clock, RefreshCw, ArrowLeft
+  RotateCcw, CheckCircle2, XCircle, ChevronRight, BookOpen, Clock, RefreshCw, ArrowLeft,
+  Users
 } from 'lucide-react';
 import { QuizQuestion, QuizTopic, QuizDifficulty } from '../types';
 import { curatedQuizQuestions } from '../data/quizQuestions';
+import MultiplayerArena from './MultiplayerArena';
 
 export default function QuizArena() {
   // Config & Quiz selection state
-  const [activeTab, setActiveTab] = useState<'curated' | 'ai'>('curated');
+  const [activeTab, setActiveTab] = useState<'curated' | 'ai' | 'multiplayer'>('curated');
   const [selectedTopic, setSelectedTopic] = useState<QuizTopic | 'all'>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<QuizDifficulty | 'all'>('all');
   
@@ -35,6 +37,14 @@ export default function QuizArena() {
   const [loading, setLoading] = useState<boolean>(false);
   const [hasApiKey, setHasApiKey] = useState<boolean>(true);
   const [errorText, setErrorText] = useState<string>('');
+
+  // Auto-detect room link parameter to open battle arena instantly
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('room')) {
+      setActiveTab('multiplayer');
+    }
+  }, []);
 
   // Check health and if API key is present
   useEffect(() => {
@@ -197,8 +207,9 @@ export default function QuizArena() {
   return (
     <div id="quiz-arena-root" className="w-full max-w-4xl mx-auto space-y-6">
       
-      {/* 1단계: 퀴즈 설정 화면 (isQuizActive가 false일 때만 표시) */}
-      {!isQuizActive ? (
+      {activeTab === 'multiplayer' ? (
+        <MultiplayerArena />
+      ) : !isQuizActive ? (
         <div className="bg-white rounded-[32px] p-6 border-4 border-zinc-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -210,7 +221,7 @@ export default function QuizArena() {
               <p className="text-zinc-500 text-sm mt-1 font-medium">엄선된 역사적인 전통 국악 상식을 겨루거나, 인공지능을 활용해 무한한 문제를 연주해 보십시오.</p>
             </div>
             
-            <div className="bg-[#FDFBF7] p-1.5 border-2 border-zinc-900 rounded-xl flex gap-1.5 self-start sm:self-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            <div className="bg-[#FDFBF7] p-1.5 border-2 border-zinc-900 rounded-xl flex flex-wrap gap-1.5 self-start sm:self-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
               <button
                 id="tab-curated"
                 onClick={() => { setActiveTab('curated'); setErrorText(''); }}
@@ -233,6 +244,18 @@ export default function QuizArena() {
               >
                 <Sparkles className="w-3 h-3 text-[#FFD700] animate-pulse" />
                 AI 무한 생성
+              </button>
+              <button
+                id="tab-multiplayer"
+                onClick={() => { setActiveTab('multiplayer'); setErrorText(''); }}
+                className={`px-4 py-2 text-xs font-black rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                  activeTab === 'multiplayer' 
+                    ? 'bg-amber-400 text-zinc-950 border-2 border-zinc-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' 
+                    : 'text-zinc-650 hover:text-zinc-900'
+                }`}
+              >
+                <Users className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                실시간 겨루기
               </button>
             </div>
           </div>

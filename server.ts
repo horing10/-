@@ -8,6 +8,8 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
+import { WebSocketServer } from "ws";
+import { curatedQuizQuestions } from "./src/data/quizQuestions";
 
 dotenv.config();
 
@@ -31,6 +33,479 @@ function getAI(): GoogleGenAI {
     });
   }
   return aiClient;
+}
+
+// ============================================================================
+// REAL-TIME MULTIPLAYER QUIZ ROOM STATE ENGINE
+// ============================================================================
+
+interface MultiplayerPlayer {
+  id: string; // client temporary ID
+  nickname: string;
+  score: number;
+  isHost: boolean;
+  selectedAnswer: number | null;
+  timeTaken: number;
+  answered: boolean;
+  answerHistory: { [key: number]: { isCorrect: boolean; selected: number } };
+  connected: boolean;
+  streak: number;
+}
+
+interface MultiplayerRoom {
+  id: string;
+  topic: string;
+  difficulty: string;
+  questions: any[];
+  players: { [id: string]: MultiplayerPlayer };
+  status: 'lobby' | 'playing' | 'revealing' | 'finished';
+  currentIndex: number;
+  timer: number;
+  maxTimer: number;
+  timerInterval: NodeJS.Timeout | null;
+  useAi: boolean;
+}
+
+const rooms: { [id: string]: MultiplayerRoom } = {};
+const connectedClients = new Map<string, any>(); // Map clientId -> WebSocket client
+const clientRooms = new Map<string, string>();   // Map clientId -> roomId
+
+// Retrieve batch of quiz questions using server-side Gemini
+async function generateAIBatchQuestions(topic: string, difficulty: string, count: number): Promise<any[]> {
+  try {
+    const ai = getAI();
+    const topicQuery = topic ? `Gugak topic: "${topic}"` : "random interesting Gugak topics";
+    const difficultyQuery = difficulty ? `difficulty: "${difficulty}"` : "medium";
+
+    const prompt = `Generate a list of exactly ${count} educational multiple-choice quiz questions in Korean about Korean Traditional Music (국악 - Gugak).
+Requirements:
+1. Topic filter: ${topicQuery}
+2. Difficulty: ${difficultyQuery}
+3. Correct answers must be strictly accurate.
+4. Output must be a JSON array of objects fitting the schema below.
+5. High quality, clear polite native Korean language.
+
+Format your output as a single JSON array containing objects with these keys:
+- topic (one of: 'instrument', 'theory', 'genre', 'history', 'general')
+- question (string, polite)
+- options (array of exactly 4 strings)
+- correctAnswer (integer, 0 to 3)
+- explanation (string)
+- difficulty (one of: 'easy', 'medium', 'hard')
+- hint (string)
+`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              topic: { type: Type.STRING },
+              question: { type: Type.STRING },
+              options: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING }
+              },
+              correctAnswer: { type: Type.INTEGER },
+              explanation: { type: Type.STRING },
+              difficulty: { type: Type.STRING },
+              hint: { type: Type.STRING }
+            },
+            required: ["topic", "question", "options", "correctAnswer", "explanation", "difficulty", "hint"]
+          }
+        }
+      }
+    });
+
+    const list = JSON.parse(response.text?.trim() || "[]");
+    return list.map((q: any, idx: number) => ({
+      ...q,
+      id: `ai-multi-${idx}-${Math.random().toString(36).substr(2, 5)}`
+    }));
+  } catch (err) {
+    console.error("AI batch questions generation failed, falling back to curated library:", err);
+    return getCuratedFallbackQuestions(topic, difficulty, count);
+  }
+}
+
+// Fallback logic inside server to extract standard curated questions
+function getCuratedFallbackQuestions(topic: string, difficulty: string, count: number): any[] {
+  let filtered = [...curatedQuizQuestions];
+  if (topic && topic !== 'all') {
+    filtered = filtered.filter(q => q.topic === topic);
+  }
+  if (difficulty && difficulty !== 'all') {
+    filtered = filtered.filter(q => q.difficulty === difficulty);
+  }
+  if (filtered.length === 0) {
+    filtered = [...curatedQuizQuestions];
+  }
+  
+  // Shuffle questions randomly
+  filtered.sort(() => Math.random() - 0.5);
+  return filtered.slice(0, count);
+}
+
+// Sanitization and cheat prevention: hide correctAnswer when 'playing'
+function broadcastRoomState(roomId: string) {
+  const room = rooms[roomId];
+  if (!room) return;
+
+  const sanitizedQuestions = room.questions.map((q, idx) => {
+    if (room.status === 'playing' && idx === room.currentIndex) {
+      // Strips correctAnswer and explanation in payload to make it absolutely secure!
+      const { correctAnswer, explanation, ...rest } = q;
+      return rest;
+    }
+    return q;
+  });
+
+  const statePayload = {
+    id: room.id,
+    topic: room.topic,
+    difficulty: room.difficulty,
+    questions: sanitizedQuestions,
+    status: room.status,
+    currentIndex: room.currentIndex,
+    timer: room.timer,
+    maxTimer: room.maxTimer,
+    useAi: room.useAi,
+    players: Object.entries(room.players).map(([id, p]) => ({
+      id: p.id,
+      nickname: p.nickname,
+      score: p.score,
+      isHost: p.isHost,
+      connected: p.connected,
+      answered: p.answered,
+      selectedAnswer: room.status === 'revealing' || room.status === 'finished' ? p.selectedAnswer : (p.selectedAnswer !== null), // Boolean value to client while playing
+      answerHistory: p.answerHistory,
+      streak: p.streak
+    }))
+  };
+
+  const message = JSON.stringify({
+    type: "ROOM_STATE",
+    payload: statePayload
+  });
+
+  // Broadcast
+  for (const pId in room.players) {
+    const ws = connectedClients.get(pId);
+    if (ws && ws.readyState === 1) { // WebSocket.OPEN
+      ws.send(message);
+    }
+  }
+}
+
+// Countdown timer loop
+function startTimerCountdown(roomId: string) {
+  const room = rooms[roomId];
+  if (!room) return;
+
+  if (room.timerInterval) {
+    clearInterval(room.timerInterval);
+  }
+
+  room.timerInterval = setInterval(() => {
+    const activeRoom = rooms[roomId];
+    if (!activeRoom || activeRoom.status !== 'playing') {
+      if (activeRoom && activeRoom.timerInterval) {
+        clearInterval(activeRoom.timerInterval);
+        activeRoom.timerInterval = null;
+      }
+      return;
+    }
+
+    activeRoom.timer -= 1;
+
+    // Tick signal for ticking client effects (optional)
+    if (activeRoom.timer <= 0) {
+      clearInterval(activeRoom.timerInterval);
+      activeRoom.timerInterval = null;
+      activeRoom.status = 'revealing';
+    }
+
+    broadcastRoomState(roomId);
+  }, 1000);
+}
+
+// Handle player exit
+function handleClientDisconnect(clientId: string) {
+  const roomId = clientRooms.get(clientId);
+  if (!roomId) return;
+
+  const room = rooms[roomId];
+  if (!room) return;
+
+  const player = room.players[clientId];
+  if (player) {
+    player.connected = false;
+
+    const anyConnected = Object.values(room.players).some(p => p.connected);
+    if (!anyConnected) {
+      // Clean room completely if nobody remains
+      setTimeout(() => {
+        const cleanupRoom = rooms[roomId];
+        if (cleanupRoom && !Object.values(cleanupRoom.players).some(p => p.connected)) {
+          if (cleanupRoom.timerInterval) {
+            clearInterval(cleanupRoom.timerInterval);
+          }
+          delete rooms[roomId];
+          console.log(`[국악 퀴즈 서버] 빈 대결방 ${roomId} 정리를 완료하게나.`);
+        }
+      }, 30000);
+    } else if (player.isHost) {
+      // Reassign host instantly to other active participant
+      const activePlayers = Object.values(room.players).filter(p => p.connected);
+      if (activePlayers.length > 0) {
+        activePlayers[0].isHost = true;
+        player.isHost = false;
+        console.log(`[국악 퀴즈 서버] 방장 연결이 끊겨 새로운 방장(${activePlayers[0].nickname})을 위촉하였네.`);
+      }
+    }
+  }
+
+  clientRooms.delete(clientId);
+  broadcastRoomState(roomId);
+}
+
+// Websocket logic
+function initializeWebSocketServer(server: any) {
+  const wss = new WebSocketServer({ noServer: true });
+
+  server.on('upgrade', (request: any, socket: any, head: any) => {
+    const pathname = new URL(request.url, `http://${request.headers.host}`).pathname;
+    // Upgrade standard path
+    wss.handleUpgrade(request, socket, head, (ws) => {
+      wss.emit('connection', ws, request);
+    });
+  });
+
+  wss.on('connection', (ws: any) => {
+    const clientId = "client-" + Math.random().toString(36).substring(2, 11);
+    connectedClients.set(clientId, ws);
+
+    ws.on('message', async (messageStr: string) => {
+      try {
+        const msg = JSON.parse(messageStr);
+        const { type, payload } = msg;
+
+        switch (type) {
+          case 'CREATE_ROOM': {
+            const { topic, difficulty, nickname, numQuestions, useAi } = payload;
+            const roomId = Math.random().toString(36).substring(2, 6).toUpperCase(); // 4-char catchy ID
+
+            let questions: any[] = [];
+            if (useAi) {
+              questions = await generateAIBatchQuestions(topic, difficulty, numQuestions || 5);
+            } else {
+              questions = getCuratedFallbackQuestions(topic, difficulty, numQuestions || 5);
+            }
+
+            const newRoom: MultiplayerRoom = {
+              id: roomId,
+              topic: topic || 'all',
+              difficulty: difficulty || 'all',
+              questions,
+              players: {},
+              status: 'lobby',
+              currentIndex: 0,
+              timer: 20,
+              maxTimer: 20,
+              timerInterval: null,
+              useAi: !!useAi
+            };
+
+            newRoom.players[clientId] = {
+              id: clientId,
+              nickname: nickname ? nickname.trim().substring(0, 8) : "명리",
+              score: 0,
+              isHost: true,
+              selectedAnswer: null,
+              timeTaken: 0,
+              answered: false,
+              answerHistory: {},
+              connected: true,
+              streak: 0
+            };
+
+            rooms[roomId] = newRoom;
+            clientRooms.set(clientId, roomId);
+
+            broadcastRoomState(roomId);
+            break;
+          }
+
+          case 'JOIN_ROOM': {
+            const { roomId, nickname } = payload;
+            const targetId = roomId ? roomId.trim().toUpperCase() : '';
+            const room = rooms[targetId];
+
+            if (!room) {
+              ws.send(JSON.stringify({
+                type: 'ERROR',
+                payload: { message: '존재하지 않거나 기한이 만료된 국악 방(Room)입니다.' }
+              }));
+              return;
+            }
+
+            if (room.status !== 'lobby') {
+              ws.send(JSON.stringify({
+                type: 'ERROR',
+                payload: { message: '이미 과거시험 경연이 시작되어 참여할 수 없다네.' }
+              }));
+              return;
+            }
+
+            let name = nickname ? nickname.trim().substring(0, 8) : "풍류객";
+            const exists = Object.values(room.players).some(p => p.nickname === name);
+            if (exists) {
+              name = `${name}_${Math.floor(Math.random() * 90) + 10}`;
+            }
+
+            room.players[clientId] = {
+              id: clientId,
+              nickname: name,
+              score: 0,
+              isHost: false,
+              selectedAnswer: null,
+              timeTaken: 0,
+              answered: false,
+              answerHistory: {},
+              connected: true,
+              streak: 0
+            };
+
+            clientRooms.set(clientId, targetId);
+            broadcastRoomState(targetId);
+            break;
+          }
+
+          case 'START_QUIZ': {
+            const roomId = clientRooms.get(clientId);
+            if (!roomId) return;
+            const room = rooms[roomId];
+            if (!room || room.status !== 'lobby') return;
+
+            const self = room.players[clientId];
+            if (!self || !self.isHost) return;
+
+            room.status = 'playing';
+            room.currentIndex = 0;
+            room.timer = 20;
+
+            startTimerCountdown(roomId);
+            broadcastRoomState(roomId);
+            break;
+          }
+
+          case 'SUBMIT_ANSWER': {
+            const roomId = clientRooms.get(clientId);
+            if (!roomId) return;
+            const room = rooms[roomId];
+            if (!room || room.status !== 'playing') return;
+
+            const player = room.players[clientId];
+            if (!player || player.answered) return;
+
+            const { answerIndex, timeTaken } = payload;
+            const currentQuestion = room.questions[room.currentIndex];
+            const isCorrect = answerIndex === currentQuestion.correctAnswer;
+
+            player.selectedAnswer = answerIndex;
+            player.answered = true;
+            player.timeTaken = timeTaken || 0;
+
+            let points = 0;
+            if (isCorrect) {
+              player.streak += 1;
+              // Points based on remaining timer seconds (out of 20)
+              const speedBonus = Math.max(0, Math.min(500, Math.round((room.timer / 20) * 500)));
+              const streakBonus = Math.min(150, player.streak * 30);
+              points = 500 + speedBonus + streakBonus;
+              player.score += points;
+            } else {
+              player.streak = 0;
+            }
+
+            player.answerHistory[room.currentIndex] = {
+              isCorrect,
+              selected: answerIndex
+            };
+
+            // Calculate if EVERY active joined participant (excl. spectator hosts or hosts with mock play) has answered
+            const activeJoinedPlayers = Object.values(room.players).filter(p => p.connected && !p.isHost);
+            const allAnswered = activeJoinedPlayers.length > 0
+              ? activeJoinedPlayers.every(p => p.answered)
+              : Object.values(room.players).filter(p => p.connected).every(p => p.answered);
+
+            if (allAnswered) {
+              if (room.timerInterval) {
+                clearInterval(room.timerInterval);
+                room.timerInterval = null;
+              }
+              room.status = 'revealing';
+            }
+
+            broadcastRoomState(roomId);
+            break;
+          }
+
+          case 'NEXT_QUESTION': {
+            const roomId = clientRooms.get(clientId);
+            if (!roomId) return;
+            const room = rooms[roomId];
+            if (!room) return;
+
+            const self = room.players[clientId];
+            if (!self || !self.isHost) return;
+
+            if (room.status === 'revealing') {
+              if (room.currentIndex + 1 < room.questions.length) {
+                room.currentIndex += 1;
+                room.status = 'playing';
+                room.timer = 20;
+
+                // Reset answer variables
+                for (const pId in room.players) {
+                  room.players[pId].answered = false;
+                  room.players[pId].selectedAnswer = null;
+                  room.players[pId].timeTaken = 0;
+                }
+
+                startTimerCountdown(roomId);
+              } else {
+                room.status = 'finished';
+                if (room.timerInterval) {
+                  clearInterval(room.timerInterval);
+                  room.timerInterval = null;
+                }
+              }
+              broadcastRoomState(roomId);
+            }
+            break;
+          }
+
+          case 'LEAVE_ROOM': {
+            handleClientDisconnect(clientId);
+            break;
+          }
+        }
+      } catch (err) {
+        console.error("WS connection processing error:", err);
+      }
+    });
+
+    ws.on('close', () => {
+      handleClientDisconnect(clientId);
+      connectedClients.delete(clientId);
+    });
+  });
 }
 
 const app = express();
@@ -258,9 +733,11 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
+  const httpServer = app.listen(PORT, "0.0.0.0", () => {
     console.log(`[국악 퀴즈 서버] 포트 ${PORT}에서 신명나게 기동 중... (http://localhost:${PORT})`);
   });
+
+  initializeWebSocketServer(httpServer);
 }
 
 startServer();
