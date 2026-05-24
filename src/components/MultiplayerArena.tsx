@@ -11,6 +11,7 @@ import {
   ArrowRight, Share2, LogOut, Check, RefreshCw, Send, ShieldAlert
 } from 'lucide-react';
 import { QuizTopic, QuizDifficulty } from '../types';
+import QRCode from 'qrcode';
 
 interface PlayerState {
   id: string;
@@ -56,6 +57,7 @@ export default function MultiplayerArena() {
   const [isJoined, setIsJoined] = useState<boolean>(false);
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string>('');
+  const [qrDataUrl, setQrDataUrl] = useState<string>('');
   
   const timerAudioRef = useRef<AudioContext | null>(null);
 
@@ -67,6 +69,27 @@ export default function MultiplayerArena() {
       setRoomId(code.toUpperCase().trim());
     }
   }, []);
+
+  // Generate QR code client-side using qrcode package, bypasses all cookies/iframe blocking!
+  useEffect(() => {
+    if (roomState?.id) {
+      const url = getJoinUrl();
+      QRCode.toDataURL(url, {
+        margin: 1,
+        width: 256,
+        color: {
+          dark: '#09090b', // Zinc 950 color
+          light: '#ffffff'
+        }
+      })
+      .then(urlData => {
+        setQrDataUrl(urlData);
+      })
+      .catch(err => {
+        console.error('QR code generation error:', err);
+      });
+    }
+  }, [roomState?.id]);
 
   // Sync nickname to localStorage
   const saveNickname = (name: string) => {
@@ -514,14 +537,17 @@ export default function MultiplayerArena() {
                       </p>
                     </div>
 
-                    {/* QR Code image via standard API */}
+                    {/* QR Code image generated completely client-side to bypass cookie block policies */}
                     <div className="w-44 h-44 mx-auto border-4 border-zinc-900 rounded-2xl bg-white p-2.5 flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                      <img 
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=09090b&data=${encodeURIComponent(getJoinUrl())}`} 
-                        alt="QR Code" 
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-contain"
-                      />
+                      {qrDataUrl ? (
+                        <img 
+                          src={qrDataUrl} 
+                          alt="QR Code" 
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <div className="text-center text-[10px] text-zinc-400 font-bold">생성 중...</div>
+                      )}
                     </div>
                   </div>
 

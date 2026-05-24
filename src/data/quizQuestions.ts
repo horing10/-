@@ -460,5 +460,109 @@ export const curatedQuizQuestions: QuizQuestion[] = [
     explanation: '적벽가(赤壁歌)는 수많이 울부짖으며 무장해 싸우는 동한의 난세와 장강 명장들의 심리전투를 판소리로 구성한 곡입니다. 거칠고 시원한 쇳소리와 우조의 장대한 에너지가 수놓여 명창들도 가장 부르기 험난한 고개로 치는 대곡입니다.',
     difficulty: 'hard',
     hint: '장렬한 불화살이 삼국지 조조의 수군을 불태우는 붉은 벽의 강가 싸움 노래입니다.'
+  },
+  // ==================== VISUAL IDENTIFICATION (3 Questions) ====================
+  {
+    id: 'v1',
+    topic: 'instrument',
+    type: 'visual',
+    instrumentId: 'gayageum',
+    question: '아래 훈장님의 설명 그림(오동나무 몸체와 기러기발 모양의 안족, 명주실 줄)을 보고 이 악기의 명칭을 고르시오.',
+    options: [
+      '가야금 (Gayageum)',
+      '해금 (Haegeum)',
+      '거문고 (Geomungo)',
+      '아쟁 (Ajaeng)'
+    ],
+    correctAnswer: 0,
+    explanation: '설명된 그림은 가야금입니다. 오동나무 울림통 위에 기러기 발 모양의 \'안족\'을 세우고 그 위에 명주 줄을 건 후 맨손끝으로 뜯어 소리를 냅니다.',
+    difficulty: 'easy',
+    hint: '오동나무 판 뒤에 12줄의 고유 줄이 안족을 타고 흐릅니다.'
+  },
+  {
+    id: 'v2',
+    topic: 'instrument',
+    type: 'visual',
+    instrumentId: 'haegeum',
+    question: '아래 그림 속 원통형 대나무 울림통과 입구대, 두 개의 명주 줄을 지녀 활을 두 줄 사이에 기운 모습의 국악기는 무엇인가요?',
+    options: [
+      '아쟁 (Ajaeng)',
+      '거문고 (Geomungo)',
+      '해금 (Haegeum)',
+      '피리 (Piri)'
+    ],
+    correctAnswer: 2,
+    explanation: '그림은 해금입니다. 입구대 아래 둥근 대나무 울림통을 달고 명주실 두 줄 사이에 활을 단단히 끼운 채 마찰하여 독창적인 애달픈 소리를 자아냅니다.',
+    difficulty: 'medium',
+    hint: '전통적으로 "깽깽이"라고 불리는 두 줄의 찰현악기입니다.'
+  },
+  {
+    id: 'v3',
+    topic: 'instrument',
+    type: 'visual',
+    instrumentId: 'janggu',
+    question: '아래 양끝 가죽 마감과 조임줄, 모래시계 형태의 고운 울림통을 가진 대표 국악 장단기는 무엇인가요?',
+    options: [
+      '북 (Buk)',
+      '징 (Jing)',
+      '장구 (Janggu)',
+      '괭과리 (Kkwaenggwari)'
+    ],
+    correctAnswer: 2,
+    explanation: '이 악기는 모래시계형 국악 전주 장단기인 장구입니다. 왼쪽 궁편과 오른쪽 채편을 양 손으로 치며 흥겨운 선율에 심장을 울리는 박자를 불어넣습니다.',
+    difficulty: 'easy',
+    hint: '한쪽은 쿵! 한쪽은 딱! 소리를 고즈넉이 빚어냅니다.'
+  },
+  // ==================== MATCHING TYPE (3 Questions) ====================
+  {
+    id: 'm1',
+    topic: 'theory',
+    type: 'matching',
+    question: '아래 왼쪽의 전통 국악 용어와 오른쪽의 알맞은 의미적 설명을 짝이어 장단을 완성하시오.',
+    options: [],
+    matchingPairs: [
+      { left: '황종 (Hwangjong)', right: '국악 12율명의 첫 음이자 으뜸음' },
+      { left: '괭과리 (Kkwaenggwari)', right: '사물놀이 중 "천둥·번개"의 소리 상징' },
+      { left: '징 (Jing)', right: '사물놀이 중 은은히 흐르는 "바람"의 상징' },
+      { left: '장구 (Janggu)', right: '사물놀이 중 대지를 적시는 "비"의 상징' }
+    ],
+    correctAnswer: 99,
+    explanation: '정확한 짝짓기입니다! 황종은 동양 12율의 기준 으뜸음이고, 괭과리는 천둥, 징은 바람, 장구는 비를 상징하며 사물놀이의 오묘한 우주 조화를 완성합니다.',
+    difficulty: 'medium',
+    hint: '사물놀이 악기들의 넷 자연 상징(천둥, 바람, 비, 구름)과 12율명 으뜸음을 대조해 보십시오.'
+  },
+  {
+    id: 'm2',
+    topic: 'instrument',
+    type: 'matching',
+    question: '다음 왼쪽 악기들의 이름과 오른쪽의 국악 관할 분류군을 알맞게 짝지어 주십시오.',
+    options: [],
+    matchingPairs: [
+      { left: '가야금', right: '명주 줄을 퉁겨 울리는 발현악기 (현악)' },
+      { left: '아쟁', right: '활대에 나무를 비벼 저음을 내는 찰현악기 (현악)' },
+      { left: '대금', right: '갈대청의 청아한 떨림을 숨길로 부는 관악기 (관악)' },
+      { left: '괭과리', right: '쇠 재질을 상쇠 망치로 치는 타악기 (타악)' }
+    ],
+    correctAnswer: 99,
+    explanation: '훌륭합니다! 국악기는 재료나 연주법에 따라 현악기(가야금, 아쟁), 관악기(대금, 피리), 타악기(괭과리, 장구)로 완벽히 분류됩니다.',
+    difficulty: 'medium',
+    hint: '손 끝으로 뜯는지, 입으로 불어 내는지, 혹은 맞부딪혀 타격을 가하는지 분류를 맞춰보세.'
+  },
+  {
+    id: 'm3',
+    topic: 'history',
+    type: 'matching',
+    question: '우리 전통 역사 속에 등장하는 명창/명인들과 그들이 수립한 업적을 알맞게 역사 짝짓기 해주십시오.',
+    options: [],
+    matchingPairs: [
+      { left: '우륵 (Uruk)', right: '가실왕의 뜻을 받들어 가야금을 전파한 명인' },
+      { left: '왕산악 (Wang San-ak)', right: '고구려에서 거문고를 대성하여 검은 학을 지휘한 재상' },
+      { left: '세종대왕 (King Sejong)', right: '정간보를 최초 구안하고 민중을 위해 여민락을 남긴 성군' },
+      { left: '신문왕 (King Sinmun)', right: '동해의 갈대로 전설의 절대피리 만파식적을 얻은 임금' }
+    ],
+    correctAnswer: 99,
+    explanation: '완벽한 짝짓기 역사 고증입니다! 고구려 거문고 창제자 왕산악, 가야가 멸망한 뒤 신라로 가 가야금을 세운 우륵, 정간보와 여민락을 친히 수확한 세종대왕, 만파식적을 기린 신문왕 모두 우리 국악사의 찬란한 등불이옵니다.',
+    difficulty: 'hard',
+    hint: '세종대왕은 정간보와 여민락, 왕산악은 고구려 거문고, 우륵은 가야의 가야금을 연상해 주구려.'
   }
 ];

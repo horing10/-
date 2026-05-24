@@ -526,21 +526,30 @@ app.get("/api/health", (req, res) => {
 // Endpoint: AI-Generated Gugak quiz question
 app.post("/api/quiz/generate", async (req, res) => {
   try {
-    const { topic, difficulty } = req.body;
+    const { topic, difficulty, type: requestedType } = req.body;
     const ai = getAI();
 
     const topicQuery = topic ? `Gugak topic: "${topic}" (could be instrument, theory, genre, history, or general)` : "a random interesting Gugak (Korean traditional music) topic";
     const difficultyQuery = difficulty ? `difficulty: "${difficulty}"` : "medium";
 
-    const prompt = `Generate a high-quality, educational, and authentic Korean Traditional Music (국악 - Gugak) multiple-choice question in Korean.
+    const typeQuery = requestedType && requestedType !== 'all'
+      ? `You MUST generate a question of type: "${requestedType}".`
+      : `You can freely choose to generate any of the three question types: 'multiple_choice' (standard 4 choices), 'visual' (instrument identification based on description of its physical visual parts), or 'matching' (matching 4 traditional terms/concepts to their definitions). Please vary the selected type frequently!`;
+
+    const prompt = `Generate a high-quality, educational, and authentic Korean Traditional Music (국악 - Gugak) quiz question in Korean.
 Requirements:
 1. Topic should match: ${topicQuery}
 2. Difficulty should match: ${difficultyQuery}
-3. Correct answer must be exactly mathematically correct and historically verified.
-4. Output must strictly conform to the JSON schema.
-5. All texts, options, explanations, and hints must be in polite, native and warm Korean language.
-6. The explanations should be interesting, including a fun fact or details of traditional practice (Gugak terms).
-7. Do not include duplicate questions resembling basic common sense. Look into authentic Gugak theory, instrument details (like Gayageum strings, Daegeum cheong, Geomungo Suldae), historical records (Sejong, King Gasil, Wang San-ak, Manpaksikjeok), or traditional genres (Pansori, Jongmyo Jeryeak, Semachi rhythm, Shinawi, Sanjo).`;
+3. Question Type should conform to: ${typeQuery}
+4. Explanation and Correct answer must be exactly correct and historically verified.
+5. Output must strictly conform to the JSON schema.
+6. All texts, options, explanations, and hints must be in polite, native and warm Korean language using traditional scholar style ("~라네", "~하오", "~라오" or polite 하오체/하십시오체).
+7. Do not include duplicate questions resembling basic common sense. Look into authentic Gugak theory, instrument details (like Gayageum strings/Anjok, Daegeum cheong, Geomungo Suldae/Gwae, Haegeum 2 strings/Wonsan, Janggu Gungpyeon/Chaepyeon), historical records (Sejong, King Gasil, Wang San-ak, Manpaksikjeok), or traditional genres (Pansori, Jongmyo Jeryeak, Semachi rhythm, Shinawi, Sanjo, Gagok).
+
+Specifically for each type:
+- If type is 'multiple_choice': 'options' must contain exactly 4 text options, 'correctAnswer' must be the index of correct option (0-3). 'matchingPairs' and 'instrumentId' can be left null/unused.
+- If type is 'visual': 'instrumentId' must be one of 'gayageum', 'geomungo', 'haegeum', or 'janggu'. State what the visual features are in the question (e.g. 12 strings, 2 strings with bow, or hourglass shape). 'options' must contain 4 instruments, and 'correctAnswer' is the index of the correct instrument option.
+- If type is 'matching': 'options' must be an empty array [], 'correctAnswer' must be 99. 'matchingPairs' must contain exactly 4 logical conceptual pairs (each with 'left' name and 'right' explanation text).`;
 
     const response = await ai.models.generateContent({
       model: "gemini-3.5-flash",
@@ -554,6 +563,26 @@ Requirements:
               type: Type.STRING,
               description: "Must be one of: 'instrument', 'theory', 'genre', 'history', 'general'"
             },
+            type: {
+              type: Type.STRING,
+              description: "Must be one of: 'multiple_choice', 'visual', 'matching'"
+            },
+            instrumentId: {
+              type: Type.STRING,
+              description: "For 'visual' type only, must select which instrument to display illustration for: 'gayageum', 'geomungo', 'haegeum', 'janggu'"
+            },
+            matchingPairs: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  left: { type: Type.STRING, description: "Gugak term/concept, e.g., '산조', '대금'" },
+                  right: { type: Type.STRING, description: "Its corresponding correct explanation or matching pair text" }
+                },
+                required: ["left", "right"]
+              },
+              description: "For 'matching' type only. Exactly 4 pairs."
+            },
             question: {
               type: Type.STRING,
               description: "Detailed quiz question in polite Korean (e.g. 존댓말)"
@@ -561,11 +590,11 @@ Requirements:
             options: {
               type: Type.ARRAY,
               items: { type: Type.STRING },
-              description: "Exactly 4 multiple choice options"
+              description: "For 'multiple_choice' and 'visual' types: exactly 4 multiple choice options. For 'matching' type: must be an empty array []"
             },
             correctAnswer: {
               type: Type.INTEGER,
-              description: "0-based index of the correct option (0, 1, 2, or 3)"
+              description: "For 'multiple_choice' and 'visual' types: 0-based index of the correct option (0-3). For 'matching' type: must be 99"
             },
             explanation: {
               type: Type.STRING,
@@ -580,7 +609,7 @@ Requirements:
               description: "A friendly hint to help the user guess the answer in Korean"
             }
           },
-          required: ["topic", "question", "options", "correctAnswer", "explanation", "difficulty", "hint"]
+          required: ["topic", "type", "question", "options", "correctAnswer", "explanation", "difficulty", "hint"]
         }
       }
     });

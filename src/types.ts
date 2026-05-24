@@ -6,12 +6,20 @@
 export type QuizTopic = 'instrument' | 'theory' | 'genre' | 'history' | 'general';
 export type QuizDifficulty = 'easy' | 'medium' | 'hard';
 
+export interface MatchingPair {
+  left: string;
+  right: string;
+}
+
 export interface QuizQuestion {
   id: string;
   topic: QuizTopic;
   question: string;
+  type?: 'multiple_choice' | 'visual' | 'matching';
+  instrumentId?: string; // For visual questions: gayageum, geomungo, daegeum, haegeum, piri, janggu, kkwaenggwari, jing
+  matchingPairs?: MatchingPair[]; // For matching questions
   options: string[];
-  correctAnswer: number; // Index of options (0-3)
+  correctAnswer: number; // Index of options (0-3) or combination
   explanation: string;
   difficulty: QuizDifficulty;
   hint: string;

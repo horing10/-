@@ -14,11 +14,176 @@ import { QuizQuestion, QuizTopic, QuizDifficulty } from '../types';
 import { curatedQuizQuestions } from '../data/quizQuestions';
 import MultiplayerArena from './MultiplayerArena';
 
+// Premium high-fidelity graphic illustrations for traditional Gugak instruments
+function GugakInstrumentVisual({ instrumentId, isAnswered }: { instrumentId: string; isAnswered: boolean }) {
+  switch (instrumentId) {
+    case 'gayageum':
+      return (
+        <div className="w-full max-w-md mx-auto h-40 bg-[#FAF7F0] border-4 border-zinc-900 rounded-3xl flex flex-col items-center justify-center p-4 relative overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] my-4">
+          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#b45309_1.5px,transparent_1.5px)] [background-size:16px_16px]"></div>
+          {/* Main Soundboard Body */}
+          <div className="w-11/12 h-12 bg-[#854d0e] rounded-xl border-2 border-zinc-900 relative flex items-center shadow-[inset_0px_2px_4px_rgba(255,255,255,0.2),2px_4px_8px_rgba(0,0,0,0.15)]">
+            <div className="absolute inset-x-4 h-[2px] bg-amber-950 opacity-30 top-3"></div>
+            <div className="absolute inset-x-4 h-[2px] bg-amber-950 opacity-20 top-8"></div>
+            
+            {/* Elegant ㅅ-shaped 안족 Pegs */}
+            <div className="absolute inset-x-12 flex justify-between px-1">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="w-3 h-5 bg-[#fef08a] border-2 border-zinc-900 rotate-45 transform origin-center flex items-center justify-center shadow-xs">
+                  <span className="text-[6px] font-sans font-black text-rose-700 -rotate-45">ㅅ</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Side mounts */}
+            <div className="absolute left-1 w-3 h-9 bg-amber-950 border-2 border-zinc-900 rounded-lg"></div>
+            <div className="absolute right-1 w-6 h-9 bg-yellow-950 border-2 border-zinc-900 rounded-lg flex flex-col justify-around py-1 px-0.5">
+              <div className="h-0.5 bg-yellow-100/40 rounded"></div>
+              <div className="h-0.5 bg-yellow-100/40 rounded"></div>
+              <div className="h-0.5 bg-yellow-100/40 rounded"></div>
+            </div>
+
+            {/* 12 Horizontal strings (Simulated) */}
+            <div className="absolute inset-x-4 h-8 flex flex-col justify-between py-1 z-10 pointer-events-none">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="h-[1.5px] bg-[#fef8c3] border-t border-zinc-950/40 w-full animate-pulse" style={{ animationDelay: `${i * 150}ms` }}></div>
+              ))}
+            </div>
+          </div>
+          <span className="text-[10px] font-mono text-amber-900 font-extrabold mt-3 uppercase tracking-widest bg-amber-100 px-3 py-1 border-2 border-zinc-900 rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            {isAnswered ? "가야금 (12줄과 명주 안족대)" : "이 전통 국악기(현악기)는 무엇일까요?"}
+          </span>
+        </div>
+      );
+    case 'geomungo':
+      return (
+        <div className="w-full max-w-md mx-auto h-40 bg-[#FAF7F0] border-4 border-zinc-900 rounded-3xl flex flex-col items-center justify-center p-4 relative overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] my-4">
+          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#78350f_1.5px,transparent_1.5px)] [background-size:16px_16px]"></div>
+          {/* Dark Charcoal Soundboard */}
+          <div className="w-11/12 h-14 bg-zinc-800 rounded-xl border-2 border-zinc-900 relative flex items-center shadow-[inset_0px_2px_4px_rgba(255,255,255,0.1),2px_4px_8px_rgba(0,0,0,0.2)]">
+            
+            {/* Raised frets (괘) */}
+            <div className="absolute left-16 right-24 flex justify-between">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="w-2.5 h-8 bg-amber-700 border-2 border-zinc-900 rounded-b-md shadow-xs"></div>
+              ))}
+            </div>
+            
+            {/* 6 Thick silk strings */}
+            <div className="absolute inset-x-4 h-10 flex flex-col justify-between py-1.5 z-10 pointer-events-none">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="h-[2px] bg-yellow-200 border-t border-zinc-950/50 w-full"></div>
+              ))}
+            </div>
+
+            {/* Headpiece tag */}
+            <div className="absolute right-2 w-8 h-10 bg-zinc-900 border-2 border-zinc-950 rounded-lg flex items-center justify-center shadow-xs">
+              <span className="text-[8px] text-zinc-400 font-serif font-black">학달</span>
+            </div>
+          </div>
+          
+          {/* Bamboo Striking Rod (술대) */}
+          <div className="w-24 h-1.5 bg-amber-150 border-2 border-zinc-900 rotate-[15deg] transform absolute bottom-10 right-14 z-20 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.15)] rounded-full"></div>
+          
+          <span className="text-[10px] font-mono text-zinc-700 font-extrabold mt-3 uppercase tracking-widest bg-zinc-100 px-3 py-1 border-2 border-zinc-900 rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            {isAnswered ? "거문고 (검은 학의 가락 & 술대)" : "이 전통 국악기(현악기)는 무엇일까요?"}
+          </span>
+        </div>
+      );
+    case 'haegeum':
+      return (
+        <div className="w-full max-w-md mx-auto h-40 bg-[#FAF7F0] border-4 border-zinc-900 rounded-3xl flex items-center justify-center gap-6 p-4 relative overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] my-4">
+          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#18181b_1.5px,transparent_1.5px)] [background-size:16px_16px]"></div>
+          
+          <div className="flex items-center gap-7 relative z-10">
+            {/* Upright Pegbox and neck */}
+            <div className="relative w-14 h-28 flex flex-col items-center">
+              {/* Wooden Tuning Pegs (주철) */}
+              <div className="absolute top-0 w-9 h-2.5 bg-amber-950 border-2 border-zinc-900 rounded-sm"></div>
+              <div className="absolute top-4 -left-2 w-7 h-2 bg-amber-800 border-2 border-zinc-900 rounded-md rotate-[-15deg]"></div>
+              <div className="absolute top-9 -left-2 w-7 h-2 bg-amber-800 border-2 border-zinc-900 rounded-md rotate-[15deg]"></div>
+              
+              {/* Neck rod */}
+              <div className="w-2.5 h-20 bg-[#6b4423] border-x-2 border-zinc-900"></div>
+              
+              {/* Bamboo Resonator (울림통) */}
+              <div className="w-12 h-11 bg-amber-900 rounded-lg border-2 border-zinc-900 shadow-md flex items-center justify-center">
+                <div className="w-10 h-[2px] bg-zinc-950"></div>
+              </div>
+              
+              {/* String bridge (원산) */}
+              <div className="absolute bottom-9 w-4 h-2.5 bg-[#fef08a] border-2 border-zinc-900 rounded-sm shadow-xs"></div>
+              
+              {/* 2 Strings */}
+              <div className="absolute top-3 bottom-11 w-2 flex justify-between px-0.5">
+                <div className="w-[1.5px] h-full bg-[#fcd34d]"></div>
+                <div className="w-[1.5px] h-full bg-[#fca5a5]"></div>
+              </div>
+            </div>
+
+            {/* Bow (활대) */}
+            <div className="relative w-28 h-12 flex items-center">
+              {/* Curved Bamboo active stick */}
+              <div className="w-full h-2.5 bg-amber-600 rounded-full border-2 border-zinc-900 rotate-[-4deg] translate-y-[-4px]"></div>
+              {/* Horsehair bow strings */}
+              <div className="absolute inset-x-1 h-[2px] bg-zinc-400 border-b-2 border-zinc-650 w-full translate-y-[4px]"></div>
+              <div className="absolute left-2 px-1 py-0.5 bg-amber-150 border border-zinc-900 text-[6px] font-bold uppercase rounded leading-none">말총 활시위</div>
+            </div>
+          </div>
+          <span className="absolute bottom-2 text-[10px] font-mono text-zinc-650 font-extrabold uppercase tracking-wider bg-white px-2 py-0.5 border-2 border-zinc-900 rounded-md">
+            {isAnswered ? "해금 (두 줄 찰현악기)" : "이 전통 국악기(찰현악기)는 무엇일까요?"}
+          </span>
+        </div>
+      );
+    case 'janggu':
+      return (
+        <div className="w-full max-w-md mx-auto h-40 bg-[#FAF7F0] border-4 border-zinc-900 rounded-3xl flex flex-col items-center justify-center p-4 relative overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] my-4">
+          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#b91c1c_1.5px,transparent_1.5px)] [background-size:16px_16px]"></div>
+          
+          <div className="flex items-center justify-center relative scale-110">
+            {/* Left drumhead (궁편) */}
+            <div className="w-7 h-20 bg-amber-100 border-2 border-zinc-900 rounded-full flex items-center justify-center z-10 shadow-md">
+              <div className="w-4 h-16 bg-amber-200/50 rounded-full border-2 border-dashed border-zinc-500"></div>
+            </div>
+            
+            {/* Waist hollow wood (허리통) */}
+            <div className="w-16 h-11 bg-[#b91c1c] border-y-2 border-zinc-900 flex justify-between items-center relative shadow-[inset_0px_2px_4px_rgba(255,255,255,0.15)]">
+              <div className="w-4 h-11 bg-zinc-950/20"></div>
+              <div className="w-3.5 h-10 bg-[#450a0a] rounded-full border border-zinc-900"></div>
+              <div className="w-4 h-11 bg-zinc-950/20"></div>
+            </div>
+            
+            {/* Right drumhead (채편) */}
+            <div className="w-6 h-20 bg-amber-50 border-2 border-zinc-900 rounded-full flex items-center justify-center z-10 shadow-md">
+              <div className="w-3.5 h-16 bg-yellow-50 rounded-full border-2 border-dashed border-zinc-400"></div>
+            </div>
+
+            {/* Red leather laces and sliding buckles (조이개) */}
+            <div className="absolute inset-x-2 inset-y-4 flex flex-col justify-around pointer-events-none z-15">
+              <div className="h-[2px] bg-red-650 w-full border-t border-zinc-950 rotate-[14deg]"></div>
+              <div className="h-[2px] bg-red-650 w-full border-t border-zinc-950 -rotate-[14deg]"></div>
+              <div className="h-[2px] bg-red-650 w-full border-t border-zinc-950"></div>
+              {/* buckle pills */}
+              <div className="absolute left-6 top-3 w-2.5 h-4 bg-amber-950 border border-zinc-900 rounded-sm"></div>
+              <div className="absolute right-6 top-11 w-2.5 h-4 bg-amber-950 border border-zinc-900 rounded-sm"></div>
+            </div>
+          </div>
+          <span className="text-[10px] font-mono text-zinc-700 font-extrabold mt-3 uppercase tracking-widest bg-white px-3 py-1 border-2 border-zinc-900 rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            {isAnswered ? "장구 (비의 소리 & 설가죽 궁채)" : "이 전통 국악기(타악기)는 무엇일까요?"}
+          </span>
+        </div>
+      );
+    default:
+      return null;
+  }
+}
+
 export default function QuizArena() {
   // Config & Quiz selection state
   const [activeTab, setActiveTab] = useState<'curated' | 'ai' | 'multiplayer'>('curated');
   const [selectedTopic, setSelectedTopic] = useState<QuizTopic | 'all'>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<QuizDifficulty | 'all'>('all');
+  const [selectedType, setSelectedType] = useState<'all' | 'multiple_choice' | 'visual' | 'matching'>('all');
   
   // Custom topic for AI infinite generator
   const [customAITopic, setCustomAITopic] = useState<string>('');
@@ -32,6 +197,11 @@ export default function QuizArena() {
   const [quizFinished, setQuizFinished] = useState<boolean>(false);
   const [showHint, setShowHint] = useState<boolean>(false);
   const [isQuizActive, setIsQuizActive] = useState<boolean>(false);
+
+  // Matching game state
+  const [selectedLeft, setSelectedLeft] = useState<number | null>(null);
+  const [matchingRightItems, setMatchingRightItems] = useState<{ id: number; text: string; originalIndex: number }[]>([]);
+  const [userMatches, setUserMatches] = useState<{ [leftIdx: number]: number }>({});
   
   // Loading & state
   const [loading, setLoading] = useState<boolean>(false);
@@ -68,17 +238,21 @@ export default function QuizArena() {
     if (selectedDifficulty !== 'all') {
       filtered = filtered.filter(q => q.difficulty === selectedDifficulty);
     }
+    if (selectedType !== 'all') {
+      filtered = filtered.filter(q => (q.type || 'multiple_choice') === selectedType);
+    }
 
     if (filtered.length === 0) {
-      setErrorText('해당 조건의 기출 퀴즈가 없습니다. 다른 분야나 난이도를 선택해 주십시오.');
+      setErrorText('해당 조건의 기출 퀴즈가 없습니다. 다른 분야, 난이도, 혹은 문제 유형을 선택해 주십시오.');
       setQuestions([]);
       return;
     }
 
     // Shuffle filtered questions
     filtered.sort(() => Math.random() - 0.5);
+    const limit = Math.min(filtered.length, 10);
     
-    setQuestions(filtered);
+    setQuestions(filtered.slice(0, limit));
     setCurrentIndex(0);
     setSelectedAnswer(null);
     setIsAnswered(false);
@@ -86,7 +260,26 @@ export default function QuizArena() {
     setQuizFinished(false);
     setShowHint(false);
     setIsQuizActive(true);
+    
+    // Reset matching state
+    setSelectedLeft(null);
+    setUserMatches({});
   };
+
+  // Initialize matching data when question shifts
+  useEffect(() => {
+    const currentQ = questions[currentIndex];
+    if (currentQ && currentQ.type === 'matching' && currentQ.matchingPairs) {
+      const shuffled = currentQ.matchingPairs.map((p, idx) => ({
+        id: idx,
+        text: p.right,
+        originalIndex: idx
+      })).sort(() => Math.random() - 0.5);
+      setMatchingRightItems(shuffled);
+      setUserMatches({});
+      setSelectedLeft(null);
+    }
+  }, [currentIndex, questions]);
 
   // Generate question using server-side Gemini
   const generateAIQuestion = async (topicStr?: string) => {
@@ -96,7 +289,8 @@ export default function QuizArena() {
     
     const requestBody = {
       topic: topicStr || (selectedTopic === 'all' ? '' : selectedTopic),
-      difficulty: selectedDifficulty === 'all' ? 'medium' : selectedDifficulty
+      difficulty: selectedDifficulty === 'all' ? 'medium' : selectedDifficulty,
+      type: selectedType
     };
 
     try {
@@ -144,14 +338,42 @@ export default function QuizArena() {
 
   // Confirm Answer
   const handleConfirmAnswer = () => {
-    if (selectedAnswer === null || isAnswered) return;
-    
-    setIsAnswered(true);
+    if (isAnswered) return;
     const currentQ = questions[currentIndex];
-    
-    if (selectedAnswer === currentQ.correctAnswer) {
-      setScore(prev => prev + 1);
+
+    if (currentQ.type === 'matching') {
+      const isAllCorrect = checkMatchingAnswerCorrect();
+      setIsAnswered(true);
+      if (isAllCorrect) {
+        setScore(prev => prev + 1);
+      }
+    } else {
+      if (selectedAnswer === null) return;
+      setIsAnswered(true);
+      if (selectedAnswer === currentQ.correctAnswer) {
+        setScore(prev => prev + 1);
+      }
     }
+  };
+
+  // Check matching correctness
+  const checkMatchingAnswerCorrect = () => {
+    const q = questions[currentIndex];
+    if (!q || !q.matchingPairs) return false;
+    
+    let isAllCorrect = true;
+    for (let leftIdx = 0; leftIdx < q.matchingPairs.length; leftIdx++) {
+      const matchedRightIndex = userMatches[leftIdx];
+      if (matchedRightIndex === undefined) {
+        isAllCorrect = false;
+        break;
+      }
+      const rightItem = matchingRightItems[matchedRightIndex];
+      if (rightItem.originalIndex !== leftIdx) {
+        isAllCorrect = false;
+      }
+    }
+    return isAllCorrect;
   };
 
   // Progress to next question or finish quiz
@@ -261,8 +483,8 @@ export default function QuizArena() {
           </div>
 
           {/* Sub-Filters / Custom Fields */}
-          <div className="mt-6 pt-5 border-t-2 border-dashed border-zinc-200 grid grid-cols-1 md:grid-cols-12 gap-5">
-            <div className="md:col-span-6 space-y-1.5">
+          <div className="mt-6 pt-5 border-t-2 border-dashed border-zinc-200 grid grid-cols-1 md:grid-cols-12 gap-5 font-sans">
+            <div className="md:col-span-4 space-y-1.5">
               <label className="text-xs font-black text-zinc-700 block">분야 분류</label>
               <select
                 value={selectedTopic}
@@ -277,7 +499,7 @@ export default function QuizArena() {
               </select>
             </div>
 
-            <div className="md:col-span-6 space-y-1.5">
+            <div className="md:col-span-4 space-y-1.5">
               <label className="text-xs font-black text-zinc-700 block">난이도</label>
               <div className="flex gap-2">
                 {(['all', 'easy', 'medium', 'hard'] as const).map((diff) => (
@@ -295,6 +517,20 @@ export default function QuizArena() {
                 ))}
               </div>
             </div>
+
+            <div className="md:col-span-4 space-y-1.5">
+              <label className="text-xs font-black text-zinc-700 block">문제 유형 (신규 다양한 방식)</label>
+              <select
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value as any)}
+                className="w-full bg-white border-2 border-zinc-900 text-zinc-900 text-sm rounded-xl px-3 py-2.5 font-bold focus:outline-hidden focus:ring-2 focus:ring-amber-400 cursor-pointer"
+              >
+                <option value="all">모든 유형 (전체)</option>
+                <option value="multiple_choice">4지선다형</option>
+                <option value="visual">악기 도해/그림 보고 명칭 맞추기</option>
+                <option value="matching">전통 국악 용어·설명 알맞게 짝짓기</option>
+              </select>
+            </div>
           </div>
 
           {/* 실시간 문제수 매칭 문구 & 메인 구동 버튼 */}
@@ -305,7 +541,8 @@ export default function QuizArena() {
                   선택하신 조건에 해당하는 기출 서고의 명품 국악 퀴즈는 <span className="text-[#E30613] text-lg font-black">{
                     curatedQuizQuestions.filter(q => 
                       (selectedTopic === 'all' || q.topic === selectedTopic) && 
-                      (selectedDifficulty === 'all' || q.difficulty === selectedDifficulty)
+                      (selectedDifficulty === 'all' || q.difficulty === selectedDifficulty) &&
+                      (selectedType === 'all' || (q.type || 'multiple_choice') === selectedType)
                     ).length
                   }개</span> 존재합니다.
                 </p>
@@ -418,55 +655,211 @@ export default function QuizArena() {
                     {questions[currentIndex].question}
                   </h3>
 
-                  {/* Options List */}
-                  <div className="space-y-4.5 mb-6">
-                    {questions[currentIndex].options.map((opt, idx) => {
-                      let optStyle = `border-2 border-zinc-900 bg-white hover:translate-y-[-2px] transition-all cursor-pointer font-bold ${shadowColors[idx]} ${borderColors[idx]}`;
+                  {/* Options List or Matching Board */}
+                  {questions[currentIndex].type === 'matching' ? (
+                    /* Elegant Matching Board Component */
+                    <div className="space-y-6 mb-6">
+                      <div className="text-[11px] font-bold text-zinc-400 font-sans tracking-wide uppercase text-center mb-2">
+                        {isAnswered 
+                          ? '짝짓기 대조 결과' 
+                          : '왼쪽 용어를 선택하고 알맞은 설명을 골라 짝을 이어 완주해 주시오.'}
+                      </div>
                       
-                      if (selectedAnswer === idx) {
-                        optStyle = 'border-4 border-zinc-900 bg-amber-50/70 font-black ring-2 ring-zinc-900 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] translate-y-[-2px]';
-                      }
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Left Column (Terms) */}
+                        <div className="space-y-3">
+                          <span className="text-xs font-black text-[#E30613] block mb-1">용어 마당</span>
+                          {questions[currentIndex].matchingPairs?.map((pair, leftIdx) => {
+                            const matchedRightIdx = userMatches[leftIdx];
+                            const isSelected = selectedLeft === leftIdx;
+                            
+                            // Obangsaek coloring presets
+                            const obangsaekBgs = ['bg-[#005BAC]/10 text-[#005BAC]', 'bg-[#E30613]/10 text-[#E30613]', 'bg-[#FFD700]/15 text-[#78350f]', 'bg-[#10B981]/10 text-[#065f46]'];
+                            const obangsaekBorders = ['border-[#005BAC]', 'border-[#E30613]', 'border-[#FFD700]', 'border-[#10B981]'];
+                            
+                            let pairBgStyle = 'bg-white border-2 border-zinc-900';
+                            if (isSelected) {
+                              pairBgStyle = 'bg-amber-100 ring-4 ring-zinc-900 border-2 border-zinc-900 scale-[1.02]';
+                            } else if (matchedRightIdx !== undefined) {
+                              const colorIdx = leftIdx % 4;
+                              pairBgStyle = `${obangsaekBgs[colorIdx]} ${obangsaekBorders[colorIdx]} border-3`;
+                            }
 
-                      if (isAnswered) {
-                        if (idx === questions[currentIndex].correctAnswer) {
-                          optStyle = 'border-4 border-emerald-500 bg-emerald-50 text-emerald-950 font-black shadow-[6px_6px_0px_0px_rgba(16,185,129,1)]';
-                        } else if (selectedAnswer === idx) {
-                          optStyle = 'border-4 border-rose-500 bg-rose-50 text-rose-950 font-black shadow-[6px_6px_0px_0px_rgba(227,6,19,1)] translate-y-0';
-                        } else {
-                          optStyle = 'border-2 border-zinc-200 bg-zinc-50/40 text-zinc-400 opacity-60 shadow-none';
-                        }
-                      }
+                            return (
+                              <button
+                                key={leftIdx}
+                                disabled={isAnswered}
+                                onClick={() => {
+                                  setSelectedLeft(leftIdx);
+                                }}
+                                className={`w-full text-left p-4 rounded-2xl font-black text-sm flex items-center justify-between transition-all duration-150 cursor-pointer ${pairBgStyle}`}
+                              >
+                                <span>
+                                  <span className="inline-block w-6 h-6 text-xs text-center leading-6 rounded-full bg-zinc-900 text-white font-mono mr-2">
+                                    {String.fromCharCode(65 + leftIdx)}
+                                  </span>
+                                  {pair.left}
+                                </span>
+                                
+                                {matchedRightIdx !== undefined && (
+                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/85 border border-current">
+                                    짝 {leftIdx + 1}
+                                  </span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
 
-                      return (
-                        <button
-                          key={idx}
-                          onClick={() => handleSelectOption(idx)}
-                          disabled={isAnswered}
-                          className={`w-full text-left p-4.5 rounded-2xl text-base transition-all focus:outline-hidden flex items-center justify-between gap-4 ${optStyle}`}
-                        >
-                          <span>
-                            <span className="font-mono mr-3 font-black text-zinc-950 text-lg">{idx + 1}.</span>
-                            {opt}
-                          </span>
-                          {isAnswered && idx === questions[currentIndex].correctAnswer && (
-                            <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
-                          )}
-                          {isAnswered && selectedAnswer === idx && idx !== questions[currentIndex].correctAnswer && (
-                            <XCircle className="w-6 h-6 text-rose-600 shrink-0" />
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
+                        {/* Right Column (Descriptions) */}
+                        <div className="space-y-3">
+                          <span className="text-xs font-black text-[#005BAC] block mb-1">설명 서고</span>
+                          {matchingRightItems.map((item, rightIdx) => {
+                            const matchedLeftIdx = Object.keys(userMatches).find(
+                              (key) => userMatches[Number(key)] === rightIdx
+                            );
+                            
+                            const obangsaekRightBgs = ['bg-[#005BAC]/10 text-zinc-900', 'bg-[#E30613]/10 text-zinc-900', 'bg-[#FFD700]/15 text-zinc-800', 'bg-[#10B981]/10 text-zinc-900'];
+                            const obangsaekRightBorders = ['border-[#005BAC]', 'border-[#E30613]', 'border-[#FFD700]', 'border-[#10B981]'];
+                            
+                            let cardStyle = 'bg-white border-2 border-zinc-200 text-zinc-600 hover:border-zinc-900 hover:text-zinc-950 hover:bg-zinc-50';
+                            
+                            if (matchedLeftIdx !== undefined) {
+                              const leftIdxNum = Number(matchedLeftIdx);
+                              const colorIdx = leftIdxNum % 4;
+                              
+                              if (isAnswered) {
+                                const isCorrect = item.originalIndex === leftIdxNum;
+                                if (isCorrect) {
+                                  cardStyle = 'bg-emerald-50 border-3 border-emerald-500 text-emerald-900 font-bold';
+                                } else {
+                                  cardStyle = 'bg-rose-50 border-3 border-rose-500 text-rose-900 font-bold';
+                                }
+                              } else {
+                                cardStyle = `${obangsaekRightBgs[colorIdx]} ${obangsaekRightBorders[colorIdx]} border-3 font-bold`;
+                              }
+                            }
+
+                            return (
+                              <button
+                                key={rightIdx}
+                                disabled={isAnswered || selectedLeft === null}
+                                onClick={() => {
+                                  if (selectedLeft === null) return;
+                                  
+                                  setUserMatches(prev => {
+                                    const next = { ...prev };
+                                    
+                                    // Make sure we enforce 1-to-1 matching (remove old matching pointing to same right elements)
+                                    Object.keys(next).forEach(k => {
+                                      if (next[Number(k)] === rightIdx) {
+                                        delete next[Number(k)];
+                                      }
+                                    });
+                                    
+                                    next[selectedLeft] = rightIdx;
+                                    return next;
+                                  });
+                                  
+                                  setSelectedLeft(null);
+                                }}
+                                className={`w-full text-left p-3.5 rounded-2xl text-xs flex items-start gap-2.5 transition-all outline-hidden cursor-pointer ${cardStyle} ${
+                                  selectedLeft !== null && matchedLeftIdx === undefined ? 'ring-2 ring-amber-300' : ''
+                                }`}
+                              >
+                                <span className="font-mono font-bold text-zinc-450 mt-0.5">•</span>
+                                <div className="flex-1 text-left leading-relaxed font-medium">
+                                  {item.text}
+                                </div>
+                                
+                                {isAnswered && matchedLeftIdx !== undefined && (
+                                  <div className="shrink-0 pt-0.5">
+                                    {item.originalIndex === Number(matchedLeftIdx) ? (
+                                      <CheckCircle2 className="w-4.5 h-4.5 text-emerald-600" />
+                                    ) : (
+                                      <XCircle className="w-4.5 h-4.5 text-rose-600" />
+                                    )}
+                                  </div>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      
+                      {/* Restart / Trigger reset option inside matching */}
+                      {!isAnswered && Object.keys(userMatches).length > 0 && (
+                        <div className="text-right">
+                          <button
+                            onClick={() => {
+                              setUserMatches({});
+                              setSelectedLeft(null);
+                            }}
+                            className="text-[10px] text-[#E30613] font-black hover:underline bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-lg cursor-pointer"
+                          >
+                            매칭 전부 초기화
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <>
+                      {/* Render Visual Illustration if question has type 'visual' */}
+                      {questions[currentIndex].type === 'visual' && (
+                        <GugakInstrumentVisual instrumentId={questions[currentIndex].instrumentId || ''} isAnswered={isAnswered} />
+                      )}
+
+                      {/* Options List */}
+                      <div className="space-y-4.5 mb-6">
+                        {questions[currentIndex].options.map((opt, idx) => {
+                          let optStyle = `border-2 border-zinc-900 bg-white hover:translate-y-[-2px] transition-all cursor-pointer font-bold ${shadowColors[idx]} ${borderColors[idx]}`;
+                          
+                          if (selectedAnswer === idx) {
+                            optStyle = 'border-4 border-zinc-900 bg-amber-50/70 font-black ring-2 ring-zinc-900 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] translate-y-[-2px]';
+                          }
+
+                          if (isAnswered) {
+                            if (idx === questions[currentIndex].correctAnswer) {
+                              optStyle = 'border-4 border-emerald-500 bg-emerald-50 text-emerald-950 font-black shadow-[6px_6px_0px_0px_rgba(16,185,129,1)]';
+                            } else if (selectedAnswer === idx) {
+                              optStyle = 'border-4 border-rose-500 bg-rose-50 text-rose-950 font-black shadow-[6px_6px_0px_0px_rgba(227,6,19,1)] translate-y-0';
+                            } else {
+                              optStyle = 'border-2 border-zinc-200 bg-zinc-50/40 text-zinc-400 opacity-60 shadow-none';
+                            }
+                          }
+
+                          return (
+                            <button
+                              key={idx}
+                              onClick={() => handleSelectOption(idx)}
+                              disabled={isAnswered}
+                              className={`w-full text-left p-4.5 rounded-2xl text-base transition-all focus:outline-hidden flex items-center justify-between gap-4 ${optStyle}`}
+                            >
+                              <span>
+                                <span className="font-mono mr-3 font-black text-zinc-950 text-lg">{idx + 1}.</span>
+                                {opt}
+                              </span>
+                              {isAnswered && idx === questions[currentIndex].correctAnswer && (
+                                <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
+                              )}
+                              {isAnswered && selectedAnswer === idx && idx !== questions[currentIndex].correctAnswer && (
+                                <XCircle className="w-6 h-6 text-rose-600 shrink-0" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
 
                   {/* Submit / Next Button controls */}
                   <div className="flex items-center justify-between gap-4 mt-6 pt-5 border-t-2 border-dashed border-zinc-200">
                     <button
                       onClick={() => setShowHint(prev => !prev)}
-                      className={`px-3 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all border-2 border-zinc-900 cursor-pointer ${
+                      className={`px-3 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all border-2 border-zinc-900 cursor-pointer shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-1px] ${
                         showHint 
-                          ? 'bg-amber-150 text-amber-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' 
-                          : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                          ? 'bg-amber-150 text-amber-950' 
+                          : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700'
                       }`}
                     >
                       <HelpCircle className="w-4 h-4" />
@@ -478,10 +871,16 @@ export default function QuizArena() {
                         <button
                           id="btn-confirm-answer"
                           onClick={handleConfirmAnswer}
-                          disabled={selectedAnswer === null}
+                          disabled={
+                            questions[currentIndex].type === 'matching'
+                              ? Object.keys(userMatches).length < (questions[currentIndex].matchingPairs?.length || 4)
+                              : selectedAnswer === null
+                          }
                           className={`px-6 py-2.5 text-xs font-black rounded-xl border-2 border-zinc-900 transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
-                            selectedAnswer === null
-                              ? 'bg-zinc-100 text-zinc-450 cursor-not-allowed'
+                            (questions[currentIndex].type === 'matching'
+                              ? Object.keys(userMatches).length < (questions[currentIndex].matchingPairs?.length || 4)
+                              : selectedAnswer === null)
+                              ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed shadow-none'
                               : 'bg-[#FFD700] hover:bg-amber-400 text-zinc-950 hover:translate-y-[-2px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-pointer'
                           }`}
                         >
