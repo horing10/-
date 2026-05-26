@@ -569,7 +569,6 @@ export default function QuizArena() {
               >
                 <option value="all">모든 유형 (전체)</option>
                 <option value="multiple_choice">4지선다형</option>
-                <option value="visual">악기 도해/그림 보고 명칭 맞추기</option>
                 <option value="matching">전통 국악 용어·설명 알맞게 짝짓기</option>
               </select>
             </div>
